@@ -1,52 +1,32 @@
 const DATA = [
-  {
-    prompt: '「生活就像一盒巧克力，你永远不知道下一颗是什么味道。」',
-    correctIdx: 0,
-    choices: [{ label: '《阿甘正传》' }, { label: '《肖申克的救赎》' }, { label: '《泰坦尼克号》' }, { label: '《星球大战》' }]
-  },
-  {
-    prompt: '「我思，故我在。」',
-    correctIdx: 0,
-    choices: [{ label: '笛卡尔' }, { label: '苏格拉底' }, { label: '亚里士多德' }, { label: '柏拉图' }]
-  },
-  {
-    prompt: '「天才是百分之一的灵感，加上百分之九十九的汗水。」',
-    correctIdx: 1,
-    choices: [{ label: '爱因斯坦' }, { label: '爱迪生' }, { label: '牛顿' }, { label: '特斯拉' }]
-  },
-  {
-    prompt: '「人固有一死，或重于泰山，或轻于鸿毛。」',
-    correctIdx: 2,
-    choices: [{ label: '孔子' }, { label: '孟子' }, { label: '司马迁' }, { label: '庄子' }]
-  },
-  {
-    prompt: '「知识就是力量。」',
-    correctIdx: 1,
-    choices: [{ label: '牛顿' }, { label: '培根' }, { label: '伏尔泰' }, { label: '卢梭' }]
-  },
-  {
-    prompt: '「先天下之忧而忧，后天下之乐而乐。」',
-    correctIdx: 0,
-    choices: [{ label: '范仲淹' }, { label: '欧阳修' }, { label: '苏轼' }, { label: '王安石' }]
-  },
-  {
-    prompt: '「你必须成为你希望在世界上看到的改变。」',
-    correctIdx: 2,
-    choices: [{ label: '曼德拉' }, { label: '马丁·路德·金' }, { label: '甘地' }, { label: '林肯' }]
-  },
-  {
-    prompt: '「我没有失败，我只是发现了一万种行不通的方法。」',
-    correctIdx: 3,
-    choices: [{ label: '特斯拉' }, { label: '居里夫人' }, { label: '牛顿' }, { label: '爱迪生' }]
-  },
-  {
-    prompt: '「学而不思则罔，思而不学则殆。」',
-    correctIdx: 1,
-    choices: [{ label: '孟子' }, { label: '孔子' }, { label: '荀子' }, { label: '老子' }]
-  },
-  {
-    prompt: '「幸福不在于拥有金钱，而在于获得成就时的喜悦。」',
-    correctIdx: 3,
-    choices: [{ label: '比尔·盖茨' }, { label: '乔布斯' }, { label: '巴菲特' }, { label: '罗斯福' }]
-  },
+  { prompt: '「生活就像一盒巧克力，你永远不知道下一颗是什么味道。」', correctIdx: 0, choices: [{label:'《阿甘正传》台词'},{label:'马克·吐温'},{label:'海明威'},{label:'卓别林'}] },
+  { prompt: '「我思故我在。」', correctIdx: 0, choices: [{label:'笛卡尔'},{label:'苏格拉底'},{label:'亚里士多德'},{label:'柏拉图'}] },
+  { prompt: '「己所不欲，勿施于人。」', correctIdx: 0, choices: [{label:'孔子'},{label:'老子'},{label:'孟子'},{label:'庄子'}] },
+  { prompt: '「天才是百分之一的灵感加上百分之九十九的汗水。」', correctIdx: 0, choices: [{label:'爱迪生'},{label:'爱因斯坦'},{label:'牛顿'},{label:'特斯拉'}] },
+  { prompt: '「知识就是力量。」', correctIdx: 0, choices: [{label:'弗朗西斯·培根'},{label:'伏尔泰'},{label:'卢梭'},{label:'洛克'}] },
+  { prompt: '「一个人能做的最勇敢的事，就是继续活下去，哪怕他很痛苦。」', correctIdx: 0, choices: [{label:'加缪'},{label:'萨特'},{label:'尼采'},{label:'叔本华'}] },
+  { prompt: '「先天下之忧而忧，后天下之乐而乐。」', correctIdx: 0, choices: [{label:'范仲淹'},{label:'欧阳修'},{label:'王安石'},{label:'苏轼'}] },
+  { prompt: '「凡是过往，皆为序章。」', correctIdx: 0, choices: [{label:'莎士比亚'},{label:'狄更斯'},{label:'雨果'},{label:'歌德'}] },
+  { prompt: '「不管前路多么崎岖，只要走，就能到达。」', correctIdx: 0, choices: [{label:'老子'},{label:'孟子'},{label:'孔子'},{label:'墨子'}] },
+  { prompt: '「人可以被消灭，但不能被打败。」', correctIdx: 0, choices: [{label:'海明威'},{label:'马克·吐温'},{label:'福克纳'},{label:'斯坦贝克'}] },
+  { prompt: '「幸福的家庭都是相似的，不幸的家庭各有各的不幸。」', correctIdx: 0, choices: [{label:'托尔斯泰'},{label:'陀思妥耶夫斯基'},{label:'普希金'},{label:'果戈里'}] },
+  { prompt: '「这是最好的时代，也是最坏的时代。」', correctIdx: 0, choices: [{label:'狄更斯'},{label:'雨果'},{label:'巴尔扎克'},{label:'福楼拜'}] },
+  { prompt: '「路漫漫其修远兮，吾将上下而求索。」', correctIdx: 0, choices: [{label:'屈原'},{label:'李白'},{label:'杜甫'},{label:'苏东坡'}] },
+  { prompt: '「我没有失败，我只是发现了一万种不管用的方法。」', correctIdx: 0, choices: [{label:'爱迪生'},{label:'特斯拉'},{label:'爱因斯坦'},{label:'居里夫人'}] },
+  { prompt: '「人生如逆旅，我亦是行人。」', correctIdx: 0, choices: [{label:'苏轼'},{label:'李白'},{label:'杜甫'},{label:'辛弃疾'}] },
+  { prompt: '「想象力比知识更重要。」', correctIdx: 0, choices: [{label:'爱因斯坦'},{label:'爱迪生'},{label:'牛顿'},{label:'霍金'}] },
+  { prompt: '「生当作人杰，死亦为鬼雄。」', correctIdx: 0, choices: [{label:'李清照'},{label:'苏轼'},{label:'辛弃疾'},{label:'陆游'}] },
+  { prompt: '「人是万物的尺度。」', correctIdx: 0, choices: [{label:'普罗泰戈拉'},{label:'苏格拉底'},{label:'柏拉图'},{label:'亚里士多德'}] },
+  { prompt: '「不积跬步，无以至千里。」', correctIdx: 0, choices: [{label:'荀子'},{label:'孔子'},{label:'孟子'},{label:'老子'}] },
+  { prompt: '「做你自己，因为其他人都有人做了。」', correctIdx: 0, choices: [{label:'王尔德'},{label:'萧伯纳'},{label:'拜伦'},{label:'雪莱'}] },
+  { prompt: '「黑夜给了我黑色的眼睛，我却用它寻找光明。」', correctIdx: 0, choices: [{label:'顾城'},{label:'北岛'},{label:'舒婷'},{label:'海子'}] },
+  { prompt: '「Stay hungry, stay foolish.」', correctIdx: 0, choices: [{label:'乔布斯'},{label:'盖茨'},{label:'贝索斯'},{label:'扎克伯格'}] },
+  { prompt: '「人活着就是为了纯粹的快乐。」', correctIdx: 0, choices: [{label:'弗洛伊德'},{label:'荣格'},{label:'阿德勒'},{label:'尼采'}] },
+  { prompt: '「不到长城非好汉。」', correctIdx: 0, choices: [{label:'毛泽东'},{label:'邓小平'},{label:'周恩来'},{label:'朱德'}] },
+  { prompt: '「Cogito, ergo sum（我思故我在）」', correctIdx: 0, choices: [{label:'笛卡尔'},{label:'康德'},{label:'黑格尔'},{label:'斯宾诺莎'}] },
+  { prompt: '「物竞天择，适者生存。」', correctIdx: 0, choices: [{label:'达尔文'},{label:'孟德尔'},{label:'赫胥黎'},{label:'拉马克'}] },
+  { prompt: '「细节决定成败。」', correctIdx: 0, choices: [{label:'汪中求'},{label:'张瑞敏'},{label:'任正非'},{label:'柳传志'}] },
+  { prompt: '「宁可枝头抱香死，何曾吹落北风中。」', correctIdx: 0, choices: [{label:'郑思肖'},{label:'陆游'},{label:'辛弃疾'},{label:'苏轼'}] },
+  { prompt: '「真正的危险不是计算机开始像人一样思考，而是人开始像计算机一样思考。」', correctIdx: 0, choices: [{label:'悉尼·哈里斯'},{label:'霍金'},{label:'比尔·盖茨'},{label:'马斯克'}] },
+  { prompt: '「你不需要成为伟大的人，但你需要伟大地开始。」', correctIdx: 0, choices: [{label:'佐贺米格尔'},{label:'乔布斯'},{label:'林肯'},{label:'罗斯福'}] },
 ];
