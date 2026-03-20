@@ -1,3 +1,4 @@
+window.GAME_ID = 'sort';
 const TOTAL = 25;
 let next = 1;
 let errors = 0;
@@ -89,6 +90,9 @@ function showSummary(elapsed) {
   document.getElementById('final-time').textContent = elapsed.toFixed(2);
   document.getElementById('final-errors').textContent = errors;
   document.getElementById('final-score').textContent = score;
+  if (typeof Player !== 'undefined' && typeof window.GAME_ID !== 'undefined') {
+    Player.saveScore(window.GAME_ID, score);
+  }
   GameEngine.screens.show('#summary-screen');
 }
 

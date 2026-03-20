@@ -1,3 +1,4 @@
+window.GAME_ID = 'headline';
 GameEngine.ChoiceRunner.init(DATA, {
   summaryTitle: '📰 真假新闻',
   renderPrompt: q => `

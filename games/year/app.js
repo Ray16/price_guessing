@@ -1,3 +1,4 @@
+window.GAME_ID = 'year';
 // Year game uses absolute year difference, not percentage
 // Override _submit to use absolute difference scoring
 GameEngine.NumberRunner._submit = function() {

@@ -1,4 +1,5 @@
-const ROUNDS = 5;
+window.GAME_ID = 'reaction';
+const ROUNDS = 10;
 let times = [];
 let round = 0;
 let state = 'idle'; // idle | waiting | set | go | result
@@ -117,6 +118,12 @@ function showSummary() {
   document.getElementById('rating-val').textContent = getRating(avg);
   document.getElementById('all-times').innerHTML =
     '各轮成绩：' + times.map((t, i) => `第${i+1}轮: ${t}ms`).join('  ·  ');
+
+  // Score: higher is better; use 10000 - avg as score (clamp to 0)
+  const score = Math.max(0, 10000 - avg * 10);
+  if (typeof Player !== 'undefined' && typeof window.GAME_ID !== 'undefined') {
+    Player.saveScore(window.GAME_ID, score);
+  }
 
   GameEngine.screens.show('#summary-screen');
 }

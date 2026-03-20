@@ -1,3 +1,4 @@
+window.GAME_ID = 'quote';
 GameEngine.ChoiceRunner.init(DATA, {
   summaryTitle: '💬 谁说的',
   renderPrompt: q => `

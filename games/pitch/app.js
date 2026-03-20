@@ -19,8 +19,9 @@ function playTone(freq, duration = 0.7) {
   osc.stop(ctx.currentTime + duration);
 }
 
+window.GAME_ID = 'pitch';
 const FREQS = [220, 247, 262, 294, 330, 349, 392, 440, 494, 523, 587, 659, 698, 784, 880];
-const ROUNDS = 10;
+const ROUNDS = 30;
 
 function generateQuestions(n) {
   return Array.from({ length: n }, () => {
@@ -131,6 +132,9 @@ function showSummary() {
   document.getElementById('final-score').textContent = score;
   document.getElementById('items-played').textContent = ROUNDS;
   document.getElementById('avg-accuracy').textContent = Math.round(correct / ROUNDS * 100) + '%';
+  if (typeof Player !== 'undefined' && typeof window.GAME_ID !== 'undefined') {
+    Player.saveScore(window.GAME_ID, score);
+  }
   GameEngine.screens.show('#summary-screen');
 }
 

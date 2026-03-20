@@ -1,3 +1,5 @@
+window.GAME_ID = 'area';
+
 function formatArea(n) {
   return n.toLocaleString('zh-CN') + ' 平方公里';
 }

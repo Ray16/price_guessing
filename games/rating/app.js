@@ -1,3 +1,4 @@
+window.GAME_ID = 'rating';
 // Rating game: score based on absolute difference from actual rating
 GameEngine.NumberRunner._submit = function() {
   const input = document.querySelector('#price-input');

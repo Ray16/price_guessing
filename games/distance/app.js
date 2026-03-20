@@ -1,3 +1,4 @@
+window.GAME_ID = 'distance';
 GameEngine.NumberRunner._fmt = function(v) {
   return Math.round(v).toLocaleString('zh-CN') + ' 公里';
 };

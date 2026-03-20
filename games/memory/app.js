@@ -1,3 +1,4 @@
+window.GAME_ID = 'memory';
 const EMOJIS = ['🐱', '🐶', '🦊', '🐼', '🦁', '🐸', '🦋', '🌸'];
 const TOTAL_PAIRS = EMOJIS.length;
 
@@ -94,6 +95,9 @@ function showWin() {
   document.getElementById('final-time').textContent = elapsed;
   document.getElementById('final-moves').textContent = flipCount;
   document.getElementById('final-score').textContent = score;
+  if (typeof Player !== 'undefined' && typeof window.GAME_ID !== 'undefined') {
+    Player.saveScore(window.GAME_ID, score);
+  }
   GameEngine.screens.show('#summary-screen');
 }
 

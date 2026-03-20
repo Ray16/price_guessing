@@ -1,3 +1,4 @@
+window.GAME_ID = 'calorie';
 // Patch _fmt before init so it's used in all submissions
 GameEngine.NumberRunner._fmt = function(v) {
   return Math.round(v).toLocaleString('zh-CN') + ' kcal';
