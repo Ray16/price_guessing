@@ -22,7 +22,7 @@ function setProgress(pct) {
 async function fetchPreviewUrl(name, artist) {
   const query = encodeURIComponent(name + ' ' + artist);
   const res = await fetch(
-    `https://itunes.apple.com/search?term=${query}&media=music&limit=10&country=CN`
+    `https://itunes.apple.com/search?term=${query}&media=music&limit=10`
   );
   const data = await res.json();
   const preferred = data.results.find(r =>
@@ -67,7 +67,8 @@ async function loadQuestion() {
     setHint('点击播放，听一听是哪首歌');
   } catch (e) {
     setNote('⚠️', false);
-    setHint('网络错误，请跳过');
+    setHint(`网络错误: ${e.message}`);
+    console.error('[music] fetchPreviewUrl failed:', e);
   }
 }
 
