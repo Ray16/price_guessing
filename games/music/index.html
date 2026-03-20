@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>听歌识曲</title>
+  <link rel="stylesheet" href="../../shared/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    .music-player {
+      width: 100%; background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); padding: 28px 24px; text-align: center;
+      margin-bottom: 24px;
+    }
+    .play-btn {
+      width: 80px; height: 80px; border-radius: 50%;
+      background: linear-gradient(135deg, #7c6cf0, #9488ff);
+      border: none; font-size: 2rem; cursor: pointer;
+      box-shadow: 0 4px 20px var(--primary-glow);
+      transition: transform 0.2s, box-shadow 0.2s;
+      display: inline-flex; align-items: center; justify-content: center;
+      margin-bottom: 12px;
+    }
+    .play-btn:hover { transform: scale(1.08); box-shadow: 0 6px 28px rgba(124,108,240,0.4); }
+    .play-btn:active { transform: scale(0.95); }
+    .play-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    .play-hint { color: var(--text-muted); font-size: 0.9rem; }
+    .clip-duration { font-size: 0.8rem; color: var(--text-muted); margin-top: 4px; }
+    /* hidden YouTube iframe */
+    #yt-frame { position: absolute; opacity: 0; pointer-events: none; width: 1px; height: 1px; }
+    .choices { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; }
+    .choice-btn {
+      background: var(--surface); border: 2px solid var(--border);
+      border-radius: var(--radius); padding: 16px 12px;
+      font-size: 0.95rem; font-weight: 600; color: var(--text);
+      cursor: pointer; font-family: inherit; transition: all 0.2s; text-align: center;
+    }
+    .choice-btn:hover:not(.locked) { border-color: var(--primary); background: var(--surface-hover); }
+    .choice-btn.correct { border-color: var(--success) !important; background: rgba(0,224,208,0.1) !important; color: var(--success); }
+    .choice-btn.wrong { border-color: var(--danger) !important; background: rgba(255,107,107,0.08) !important; }
+    .choice-btn.locked { pointer-events: none; }
+    .result-section.hidden { display: none; }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div id="game-screen" class="screen active">
+      <header class="game-header">
+        <a href="../../index.html" class="btn-back">← 返回</a>
+        <div class="progress"><span id="progress-text"></span></div>
+        <div class="score-display">得分: <span id="score">0</span></div>
+      </header>
+      <main class="game-main">
+        <!-- Hidden YouTube player -->
+        <iframe id="yt-frame" allow="autoplay"></iframe>
+
+        <div class="music-player">
+          <button class="play-btn" id="play-btn">▶</button>
+          <div class="play-hint" id="play-hint">点击播放片段</div>
+          <div class="clip-duration">🎵 听一听，猜猜是哪首歌？</div>
+        </div>
+
+        <div id="choices-container"></div>
+
+        <div id="result-section" class="result-section hidden" style="width:100%">
+          <div id="result-card" class="result-card" style="text-align:center;margin-bottom:20px">
+            <div id="result-emoji" class="result-emoji"></div>
+            <div style="font-size:1.1rem;font-weight:700;margin-bottom:4px" id="result-song"></div>
+            <div style="color:var(--text-muted);font-size:0.9rem" id="result-artist"></div>
+            <p id="result-message" class="result-message" style="margin-top:10px"></p>
+          </div>
+          <div class="result-actions">
+            <button id="btn-next" class="btn-primary">下一首 →</button>
+            <a href="../../index.html" class="btn-secondary">返回首页</a>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <div id="summary-screen" class="screen">
+      <div class="summary-content">
+        <h2>游戏结束！</h2>
+        <div class="summary-theme">🎶 听歌识曲</div>
+        <div class="summary-stats">
+          <div class="stat"><span class="stat-value" id="final-score">0</span><span class="stat-label">得分</span></div>
+          <div class="stat"><span class="stat-value" id="items-played">0</span><span class="stat-label">题数</span></div>
+          <div class="stat"><span class="stat-value" id="avg-accuracy">0%</span><span class="stat-label">正确率</span></div>
+        </div>
+        <div class="summary-actions">
+          <button class="btn-primary" onclick="location.reload()">再玩一次</button>
+          <a href="../../index.html" class="btn-secondary">返回首页</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../../shared/firebase-config.js"></script>
+  <script src="../../shared/player.js"></script>
+  <script src="../../shared/engine.js"></script>
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
