@@ -9,7 +9,7 @@
   <style>
     .music-player {
       width: 100%; background: var(--surface); border: 1px solid var(--border);
-      border-radius: var(--radius-lg); padding: 28px 24px; text-align: center;
+      border-radius: var(--radius-lg); padding: 32px 24px; text-align: center;
       margin-bottom: 24px;
     }
     .play-btn {
@@ -19,15 +19,23 @@
       box-shadow: 0 4px 20px var(--primary-glow);
       transition: transform 0.2s, box-shadow 0.2s;
       display: inline-flex; align-items: center; justify-content: center;
-      margin-bottom: 12px;
+      margin-bottom: 16px; color: #fff;
     }
-    .play-btn:hover { transform: scale(1.08); box-shadow: 0 6px 28px rgba(124,108,240,0.4); }
-    .play-btn:active { transform: scale(0.95); }
-    .play-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-    .play-hint { color: var(--text-muted); font-size: 0.9rem; }
-    .clip-duration { font-size: 0.8rem; color: var(--text-muted); margin-top: 4px; }
-    @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.2)} }
-    .playing-anim { animation: pulse 0.6s ease-in-out infinite; }
+    .play-btn:hover:not(:disabled) { transform: scale(1.08); box-shadow: 0 6px 28px rgba(124,108,240,0.4); }
+    .play-btn:active:not(:disabled) { transform: scale(0.95); }
+    .play-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .music-note { font-size: 3rem; margin-bottom: 8px; display: block; }
+    .play-hint { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 4px; }
+    .clip-bar {
+      width: 100%; height: 4px; background: var(--border);
+      border-radius: 2px; margin-top: 16px; overflow: hidden;
+    }
+    .clip-progress {
+      height: 100%; width: 0%; background: var(--primary);
+      border-radius: 2px; transition: width 0.2s linear;
+    }
+    @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.15)} }
+    .pulsing { animation: pulse 0.7s ease-in-out infinite; display: inline-block; }
     .choices { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; }
     .choice-btn {
       background: var(--surface); border: 2px solid var(--border);
@@ -51,28 +59,20 @@
         <div class="score-display">得分: <span id="score">0</span></div>
       </header>
       <main class="game-main">
-        <!-- YouTube player wrapper — player is visible to browser but covered visually -->
-        <div style="position:relative;width:320px;height:180px;margin:0 auto 16px;border-radius:12px;overflow:hidden;background:#000">
-          <div id="yt-frame" style="width:320px;height:180px"></div>
-          <!-- Overlay so the video (and song title) isn't visible, only audio plays -->
-          <div id="yt-overlay" style="position:absolute;inset:0;background:#1a1a2e;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;border-radius:12px;pointer-events:none">
-            <div id="music-anim" style="font-size:2.5rem">🎵</div>
-            <div id="music-anim-label" style="color:#8888a0;font-size:0.85rem">等待播放…</div>
-          </div>
-        </div>
 
         <div class="music-player">
-          <button class="play-btn" id="play-btn">▶</button>
-          <div class="play-hint" id="play-hint">点击播放片段</div>
-          <div class="clip-duration">🎵 听一听，猜猜是哪首歌？</div>
+          <span class="music-note" id="music-note">🎵</span>
+          <div class="play-hint" id="play-hint">点击播放，听一听是哪首歌</div>
+          <button class="play-btn" id="play-btn" disabled>▶</button>
+          <div class="clip-bar"><div class="clip-progress" id="clip-progress"></div></div>
         </div>
 
         <div id="choices-container"></div>
 
-        <div id="result-section" class="result-section hidden" style="width:100%">
+        <div id="result-section" class="result-section hidden" style="width:100%;margin-top:16px">
           <div id="result-card" class="result-card" style="text-align:center;margin-bottom:20px">
             <div id="result-emoji" class="result-emoji"></div>
-            <div style="font-size:1.1rem;font-weight:700;margin-bottom:4px" id="result-song"></div>
+            <div style="font-size:1.15rem;font-weight:700;margin-bottom:4px" id="result-song"></div>
             <div style="color:var(--text-muted);font-size:0.9rem" id="result-artist"></div>
             <p id="result-message" class="result-message" style="margin-top:10px"></p>
           </div>
@@ -81,6 +81,7 @@
             <a href="../../index.html" class="btn-secondary">返回首页</a>
           </div>
         </div>
+
       </main>
     </div>
 

@@ -2,110 +2,122 @@ window.GAME_ID = 'music';
 
 const questions = GameEngine.utils.shuffle([...DATA]);
 let idx = 0, score = 0, correct = 0, streak = 0;
-let ytPlayer = null, clipTimer = null;
+let audio = null, clipTimer = null, progressTimer = null;
 
-const CLIP_SECONDS = 12;
+const CLIP_SECONDS = 15;
+const NOTE_PLAYING = '🎶';
+const NOTE_IDLE = '🎵';
 
-function setOverlay(state) {
-  const anim = document.getElementById('music-anim');
-  const label = document.getElementById('music-anim-label');
-  if (state === 'loading')  { anim.textContent = '🎵'; anim.className = ''; label.textContent = '加载中…'; }
-  if (state === 'ready')    { anim.textContent = '🎵'; anim.className = ''; label.textContent = '点击播放'; }
-  if (state === 'playing')  { anim.textContent = '🎶'; anim.className = 'playing-anim'; label.textContent = '播放中…'; }
-  if (state === 'paused')   { anim.textContent = '🎵'; anim.className = ''; label.textContent = '已暂停'; }
-  if (state === 'done')     { anim.textContent = '✅'; anim.className = ''; label.textContent = '片段结束'; }
+function audioUrl(id) {
+  return `https://music.163.com/song/media/outer/url?id=${id}.mp3`;
 }
 
-// ── YouTube IFrame API ──
-window.onYouTubeIframeAPIReady = function() {
-  const first = questions[0];
-  ytPlayer = new YT.Player('yt-frame', {
-    width: '320',
-    height: '180',
-    videoId: first.ytId,
-    playerVars: {
-      autoplay: 0,
-      controls: 0,
-      disablekb: 1,
-      fs: 0,
-      modestbranding: 1,
-      rel: 0,
-      iv_load_policy: 3,
-    },
-    events: {
-      onReady() {
-        ytPlayer.cueVideoById({ videoId: first.ytId, startSeconds: first.start });
-        document.getElementById('play-btn').disabled = false;
-        setOverlay('ready');
-      },
-      onStateChange(e) {
-        if (e.data === YT.PlayerState.PLAYING) {
-          setOverlay('playing');
-          clearTimeout(clipTimer);
-          clipTimer = setTimeout(() => {
-            ytPlayer.pauseVideo();
-            document.getElementById('play-btn').textContent = '↩';
-            document.getElementById('play-hint').textContent = '片段结束，可重听';
-            setOverlay('done');
-          }, CLIP_SECONDS * 1000);
-        }
-        if (e.data === YT.PlayerState.PAUSED) {
-          setOverlay('paused');
-        }
-        if (e.data === YT.PlayerState.CUED) {
-          document.getElementById('play-btn').disabled = false;
-          setOverlay('ready');
-        }
-        if (e.data === YT.PlayerState.BUFFERING) {
-          setOverlay('loading');
-        }
-      },
-      onError(e) {
-        // Video can't be embedded — show message
-        setOverlay('ready');
-        document.getElementById('music-anim-label').textContent = '⚠️ 此视频无法播放，请跳过';
-        document.getElementById('play-btn').disabled = true;
-      }
-    }
-  });
-};
+function setHint(text) { document.getElementById('play-hint').textContent = text; }
+function setNote(n, pulse) {
+  const el = document.getElementById('music-note');
+  el.textContent = n;
+  el.className = pulse ? 'music-note pulsing' : 'music-note';
+}
+function setProgress(pct) {
+  document.getElementById('clip-progress').style.width = pct + '%';
+}
 
-(function loadYTScript() {
-  const tag = document.createElement('script');
-  tag.src = 'https://www.youtube.com/iframe_api';
-  document.head.appendChild(tag);
-})();
-
-// ── Game Logic ──
+// ── Load question ──
 function loadQuestion() {
+  stopAudio();
   const q = questions[idx];
   document.getElementById('progress-text').textContent = `${idx + 1} / ${questions.length}`;
-  document.getElementById('play-btn').textContent = '▶';
-  document.getElementById('play-btn').disabled = true;
-  document.getElementById('play-hint').textContent = '加载中…';
   document.getElementById('result-section').classList.add('hidden');
-  setOverlay('loading');
+  document.getElementById('play-btn').textContent = '▶';
+  document.getElementById('play-btn').disabled = false;
+  setNote(NOTE_IDLE, false);
+  setHint('点击播放，听一听是哪首歌');
+  setProgress(0);
 
-  if (ytPlayer && ytPlayer.cueVideoById) {
-    ytPlayer.cueVideoById({ videoId: q.ytId, startSeconds: q.start });
-  }
+  // Pre-load audio
+  audio = new Audio();
+  audio.crossOrigin = 'anonymous';
+  audio.src = audioUrl(q.id);
+  audio.preload = 'auto';
 
+  audio.addEventListener('error', () => {
+    setNote('⚠️', false);
+    setHint('此曲暂时无法加载，请跳过');
+    document.getElementById('play-btn').disabled = true;
+  });
+
+  // Render choices
   const shuffled = GameEngine.utils.shuffle([...q.choices]);
   document.getElementById('choices-container').innerHTML =
     `<div class="choices">${shuffled.map(c =>
       `<button class="choice-btn" data-choice="${c}">${c}</button>`
     ).join('')}</div>`;
-
   document.querySelectorAll('.choice-btn').forEach(btn => {
     btn.addEventListener('click', () => pick(btn.dataset.choice, q));
   });
 }
 
-function pick(choice, q) {
-  clearTimeout(clipTimer);
-  if (ytPlayer) ytPlayer.pauseVideo();
+// ── Play / Pause ──
+document.getElementById('play-btn').addEventListener('click', () => {
+  if (!audio) return;
+  const q = questions[idx];
 
-  const isCorrect = choice === q.answer;
+  if (audio.paused) {
+    // Seek to start position if it's a fresh play
+    if (audio.currentTime < q.start || audio.currentTime > q.start + CLIP_SECONDS) {
+      audio.currentTime = q.start;
+    }
+    audio.play().then(() => {
+      document.getElementById('play-btn').textContent = '⏸';
+      setNote(NOTE_PLAYING, true);
+      setHint('播放中…');
+      startClipTimer(q);
+    }).catch(() => {
+      setNote('⚠️', false);
+      setHint('播放失败，请跳过');
+    });
+  } else {
+    audio.pause();
+    document.getElementById('play-btn').textContent = '▶';
+    setNote(NOTE_IDLE, false);
+    setHint('已暂停，点击继续');
+    clearTimers();
+  }
+});
+
+function startClipTimer(q) {
+  clearTimers();
+  const endTime = q.start + CLIP_SECONDS;
+  const startedAt = Date.now();
+
+  progressTimer = setInterval(() => {
+    const elapsed = (Date.now() - startedAt) / 1000;
+    setProgress(Math.min(elapsed / CLIP_SECONDS * 100, 100));
+    if (elapsed >= CLIP_SECONDS) {
+      stopAudio();
+      document.getElementById('play-btn').textContent = '↩';
+      setNote(NOTE_IDLE, false);
+      setHint('片段结束，可点击重听');
+      setProgress(100);
+    }
+  }, 100);
+}
+
+function clearTimers() {
+  clearTimeout(clipTimer);
+  clearInterval(progressTimer);
+}
+
+function stopAudio() {
+  clearTimers();
+  if (audio) { audio.pause(); audio = null; }
+  document.getElementById('play-btn').textContent = '▶';
+}
+
+// ── Pick answer ──
+function pick(choice, q) {
+  stopAudio();
+  const isCorrect = choice === q.name;
   if (isCorrect) { streak++; correct++; } else { streak = 0; }
   const pts = isCorrect ? (100 + Math.min(streak - 1, 4) * 10) : 0;
   score += pts;
@@ -113,42 +125,25 @@ function pick(choice, q) {
 
   document.querySelectorAll('.choice-btn').forEach(btn => {
     btn.classList.add('locked');
-    if (btn.dataset.choice === q.answer) btn.classList.add('correct');
+    if (btn.dataset.choice === q.name) btn.classList.add('correct');
     else if (btn.dataset.choice === choice && !isCorrect) btn.classList.add('wrong');
   });
 
+  setNote(isCorrect ? '🎉' : '😢', false);
   document.getElementById('result-emoji').textContent = isCorrect ? (streak >= 3 ? '🔥' : '✅') : '❌';
-  document.getElementById('result-song').textContent = q.answer;
+  document.getElementById('result-song').textContent = `《${q.name}》`;
   document.getElementById('result-artist').textContent = `— ${q.artist}`;
   document.getElementById('result-message').textContent = isCorrect
     ? `答对了！${streak >= 2 ? `连对${streak}个 (+${pts}分)` : `(+${pts}分)`}`
-    : `答错了！正确答案是「${q.answer}」`;
+    : `答错了！正确答案是《${q.name}》`;
   document.getElementById('result-card').className = `result-card ${isCorrect ? 'excellent' : 'off'}`;
   document.getElementById('btn-next').textContent = idx >= questions.length - 1 ? '查看结果' : '下一首 →';
   document.getElementById('result-section').classList.remove('hidden');
-  setOverlay('done');
 }
 
-document.getElementById('play-btn').addEventListener('click', () => {
-  if (!ytPlayer || !ytPlayer.getPlayerState) return;
-  const q = questions[idx];
-  const state = ytPlayer.getPlayerState();
-  if (state === YT.PlayerState.PLAYING) {
-    ytPlayer.pauseVideo();
-    document.getElementById('play-btn').textContent = '▶';
-    document.getElementById('play-hint').textContent = '已暂停，点击继续';
-    clearTimeout(clipTimer);
-  } else {
-    ytPlayer.seekTo(q.start, true);
-    ytPlayer.playVideo();
-    document.getElementById('play-btn').textContent = '⏸';
-    document.getElementById('play-hint').textContent = '播放中…';
-  }
-});
-
+// ── Next ──
 document.getElementById('btn-next').addEventListener('click', () => {
-  clearTimeout(clipTimer);
-  if (ytPlayer) ytPlayer.pauseVideo();
+  stopAudio();
   idx++;
   if (idx >= questions.length) {
     if (typeof Player !== 'undefined') Player.saveScore('music', score);
@@ -161,16 +156,5 @@ document.getElementById('btn-next').addEventListener('click', () => {
   }
 });
 
-// Init first question UI immediately
-document.getElementById('progress-text').textContent = `1 / ${questions.length}`;
-document.getElementById('play-btn').disabled = true;
-setOverlay('loading');
-
-const firstShuffled = GameEngine.utils.shuffle([...questions[0].choices]);
-document.getElementById('choices-container').innerHTML =
-  `<div class="choices">${firstShuffled.map(c =>
-    `<button class="choice-btn" data-choice="${c}">${c}</button>`
-  ).join('')}</div>`;
-document.querySelectorAll('.choice-btn').forEach(btn => {
-  btn.addEventListener('click', () => pick(btn.dataset.choice, questions[0]));
-});
+// ── Init ──
+loadQuestion();

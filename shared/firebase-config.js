@@ -9,5 +9,5 @@
 // ============================================================
 
 const FIREBASE_CONFIG = {
-  databaseURL: "https://YOUR_PROJECT_ID-default-rtdb.firebaseio.com",
+  databaseURL: "https://game-e7113-default-rtdb.firebaseio.com",
 };
