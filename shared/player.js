@@ -12,11 +12,31 @@ const Player = (() => {
     return `${d.getUTCFullYear()}-W${week}`;
   }
 
-  // Current player stored locally (device preference)
   const LOCAL_KEY = 'pg_current_player';
 
   function dbUrl(path) {
     return `${FIREBASE_CONFIG.databaseURL}/${path}.json`;
+  }
+
+  // ── Firebase connectivity check (call once on page load to verify setup) ──
+  async function checkFirebase() {
+    try {
+      const res = await fetch(dbUrl('_ping'), {
+        method: 'PUT',
+        body: JSON.stringify(Date.now()),
+      });
+      if (!res.ok) {
+        const text = await res.text();
+        console.error('[Firebase] Write failed:', res.status, text);
+        if (res.status === 401 || res.status === 403) {
+          console.error('[Firebase] Permission denied — check your database rules at https://console.firebase.google.com');
+        }
+      } else {
+        console.log('[Firebase] Connected OK');
+      }
+    } catch (e) {
+      console.error('[Firebase] Network error:', e.message);
+    }
   }
 
   return {
@@ -34,19 +54,20 @@ const Player = (() => {
       const week = getWeekKey();
       const path = `rankings/${week}/${player}/games/${gameId}`;
 
-      // Read current score first, only update if higher
       try {
         const res = await fetch(dbUrl(path));
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const current = await res.json();
         if (current !== null && current >= score) return;
-        await fetch(dbUrl(path), {
+        const writeRes = await fetch(dbUrl(path), {
           method: 'PUT',
           body: JSON.stringify(score),
         });
-        // Update total
+        if (!writeRes.ok) throw new Error(`Write failed: HTTP ${writeRes.status}`);
+        console.log(`[Firebase] Saved ${gameId} score: ${score} for ${player}`);
         await this._updateTotal(player, week);
       } catch (e) {
-        console.warn('Firebase save failed, falling back to localStorage', e);
+        console.warn('[Firebase] Save failed, using localStorage fallback:', e.message);
         _localSave(player, gameId, score);
       }
     },
@@ -54,6 +75,7 @@ const Player = (() => {
     async _updateTotal(player, week) {
       try {
         const res = await fetch(dbUrl(`rankings/${week}/${player}/games`));
+        if (!res.ok) return;
         const games = await res.json();
         if (!games) return;
         const total = Object.values(games).reduce((a, b) => a + b, 0);
@@ -68,6 +90,7 @@ const Player = (() => {
       const week = getWeekKey();
       try {
         const res = await fetch(dbUrl(`rankings/${week}`));
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
         return {
           weekKey: week,
@@ -75,12 +98,14 @@ const Player = (() => {
           Hebe: { total: data?.Hebe?.total || 0, games: data?.Hebe?.games || {} },
         };
       } catch (e) {
+        console.warn('[Firebase] getRankings failed:', e.message);
         return { weekKey: week, Ray: { total: 0, games: {} }, Hebe: { total: 0, games: {} } };
       }
     },
+
+    checkFirebase,
   };
 
-  // localStorage fallback
   function _localSave(player, gameId, score) {
     const key = 'pg_local_scores';
     const week = getWeekKey();
@@ -92,3 +117,6 @@ const Player = (() => {
     localStorage.setItem(key, JSON.stringify(data));
   }
 })();
+
+// Run connectivity check on load (results visible in browser DevTools console)
+Player.checkFirebase();

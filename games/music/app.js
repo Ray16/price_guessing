@@ -2,15 +2,11 @@ window.GAME_ID = 'music';
 
 const questions = GameEngine.utils.shuffle([...DATA]).slice(0, 10);
 let idx = 0, score = 0, correct = 0, streak = 0;
-let audio = null, clipTimer = null, progressTimer = null;
+let audio = null, progressTimer = null;
 
-const CLIP_SECONDS = 15;
+const CLIP_SECONDS = 30;
 const NOTE_PLAYING = '🎶';
 const NOTE_IDLE = '🎵';
-
-function audioUrl(id) {
-  return `https://music.163.com/song/media/outer/url?id=${id}.mp3`;
-}
 
 function setHint(text) { document.getElementById('play-hint').textContent = text; }
 function setNote(n, pulse) {
@@ -22,32 +18,35 @@ function setProgress(pct) {
   document.getElementById('clip-progress').style.width = pct + '%';
 }
 
+// ── Fetch 30-second preview URL from iTunes Search API ──
+async function fetchPreviewUrl(name, artist) {
+  const query = encodeURIComponent(name + ' ' + artist);
+  const res = await fetch(
+    `https://itunes.apple.com/search?term=${query}&media=music&limit=10&country=CN`
+  );
+  const data = await res.json();
+  // Prefer studio version over live/remix
+  const preferred = data.results.find(r =>
+    r.previewUrl &&
+    !/(live|现场|remix|翻唱)/i.test(r.trackName)
+  );
+  const fallback = data.results.find(r => r.previewUrl);
+  return (preferred || fallback)?.previewUrl || null;
+}
+
 // ── Load question ──
-function loadQuestion() {
+async function loadQuestion() {
   stopAudio();
   const q = questions[idx];
   document.getElementById('progress-text').textContent = `${idx + 1} / ${questions.length}`;
   document.getElementById('result-section').classList.add('hidden');
   document.getElementById('play-btn').textContent = '▶';
-  document.getElementById('play-btn').disabled = false;
+  document.getElementById('play-btn').disabled = true;
   setNote(NOTE_IDLE, false);
-  setHint('点击播放，听一听是哪首歌');
+  setHint('加载中…');
   setProgress(0);
 
-  // Pre-load audio (no crossOrigin — NetEase doesn't send CORS headers)
-  audio = new Audio();
-  audio.src = audioUrl(q.id);
-  audio.preload = 'metadata';
-
-  audio.addEventListener('error', (e) => {
-    const codes = { 1:'已终止', 2:'网络错误', 3:'解码错误', 4:'资源不支持' };
-    const msg = codes[audio.error?.code] || '未知错误';
-    setNote('⚠️', false);
-    setHint(`加载失败 (${msg})，请跳过`);
-    document.getElementById('play-btn').disabled = true;
-  });
-
-  // Render choices
+  // Render choices immediately
   const shuffled = GameEngine.utils.shuffle([...q.choices]);
   document.getElementById('choices-container').innerHTML =
     `<div class="choices">${shuffled.map(c =>
@@ -56,52 +55,66 @@ function loadQuestion() {
   document.querySelectorAll('.choice-btn').forEach(btn => {
     btn.addEventListener('click', () => pick(btn.dataset.choice, q));
   });
+
+  // Fetch preview URL from iTunes
+  let previewUrl;
+  try {
+    previewUrl = await fetchPreviewUrl(q.name, q.artist);
+  } catch (e) {
+    setNote('⚠️', false);
+    setHint('网络错误，请跳过');
+    return;
+  }
+
+  if (!previewUrl) {
+    setNote('⚠️', false);
+    setHint('未找到音频，请跳过');
+    return;
+  }
+
+  audio = new Audio(previewUrl);
+
+  audio.addEventListener('error', () => {
+    setNote('⚠️', false);
+    setHint('加载失败，请跳过');
+    document.getElementById('play-btn').disabled = true;
+  });
+
+  audio.addEventListener('canplay', () => {
+    document.getElementById('play-btn').disabled = false;
+    setHint('点击播放，听一听是哪首歌');
+  }, { once: true });
+
+  audio.load();
 }
 
 // ── Play / Pause ──
 document.getElementById('play-btn').addEventListener('click', () => {
   if (!audio) return;
-  const q = questions[idx];
 
   if (audio.paused) {
-    setHint('加载中…');
-    document.getElementById('play-btn').disabled = true;
-
-    const doPlay = () => {
-      audio.currentTime = q.start;
-      audio.play().then(() => {
-        document.getElementById('play-btn').textContent = '⏸';
-        document.getElementById('play-btn').disabled = false;
-        setNote(NOTE_PLAYING, true);
-        setHint('播放中…');
-        startClipTimer(q);
-      }).catch((err) => {
-        document.getElementById('play-btn').disabled = false;
-        setNote('⚠️', false);
-        setHint(`播放失败: ${err.message}`);
-      });
-    };
-
-    // If already loaded enough, play immediately; otherwise wait
-    if (audio.readyState >= 1) {
-      doPlay();
-    } else {
-      audio.addEventListener('loadedmetadata', doPlay, { once: true });
-    }
+    audio.currentTime = 0;
+    audio.play().then(() => {
+      document.getElementById('play-btn').textContent = '⏸';
+      setNote(NOTE_PLAYING, true);
+      setHint('播放中…');
+      startClipTimer();
+    }).catch(err => {
+      setNote('⚠️', false);
+      setHint(`播放失败: ${err.message}`);
+    });
   } else {
     audio.pause();
     document.getElementById('play-btn').textContent = '▶';
     setNote(NOTE_IDLE, false);
     setHint('已暂停，点击继续');
-    clearTimers();
+    clearInterval(progressTimer);
   }
 });
 
-function startClipTimer(q) {
-  clearTimers();
-  const endTime = q.start + CLIP_SECONDS;
+function startClipTimer() {
+  clearInterval(progressTimer);
   const startedAt = Date.now();
-
   progressTimer = setInterval(() => {
     const elapsed = (Date.now() - startedAt) / 1000;
     setProgress(Math.min(elapsed / CLIP_SECONDS * 100, 100));
@@ -115,13 +128,8 @@ function startClipTimer(q) {
   }, 100);
 }
 
-function clearTimers() {
-  clearTimeout(clipTimer);
-  clearInterval(progressTimer);
-}
-
 function stopAudio() {
-  clearTimers();
+  clearInterval(progressTimer);
   if (audio) { audio.pause(); audio = null; }
   document.getElementById('play-btn').textContent = '▶';
 }
