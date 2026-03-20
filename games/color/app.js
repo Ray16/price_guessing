@@ -21,7 +21,7 @@ function generateQuestions(n = 10) {
   });
 }
 
-GameEngine.ChoiceRunner.init(generateQuestions(30), {
+GameEngine.ChoiceRunner.init(generateQuestions(10), {
   summaryTitle: '🎨 猜颜色',
   swatchBtn: true,
   renderPrompt: q => `

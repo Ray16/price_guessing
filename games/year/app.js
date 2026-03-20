@@ -37,7 +37,7 @@ GameEngine.NumberRunner._submit = function() {
   $('#result-section').classList.remove('hidden');
 };
 
-GameEngine.NumberRunner.init(DATA, {
+GameEngine.NumberRunner.init(DATA.slice(0, 10), {
   symbol: '',
   decimals: 0,
   label: '这件事发生在哪一年？',

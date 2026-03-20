@@ -21,7 +21,7 @@ function playTone(freq, duration = 0.7) {
 
 window.GAME_ID = 'pitch';
 const FREQS = [220, 247, 262, 294, 330, 349, 392, 440, 494, 523, 587, 659, 698, 784, 880];
-const ROUNDS = 30;
+const ROUNDS = 10;
 
 function generateQuestions(n) {
   return Array.from({ length: n }, () => {

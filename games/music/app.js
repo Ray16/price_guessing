@@ -1,6 +1,6 @@
 window.GAME_ID = 'music';
 
-const questions = GameEngine.utils.shuffle([...DATA]);
+const questions = GameEngine.utils.shuffle([...DATA]).slice(0, 10);
 let idx = 0, score = 0, correct = 0, streak = 0;
 let audio = null, clipTimer = null, progressTimer = null;
 

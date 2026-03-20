@@ -4,7 +4,7 @@ function formatArea(n) {
   return n.toLocaleString('zh-CN') + ' 平方公里';
 }
 
-GameEngine.ChoiceRunner.init(DATA, {
+GameEngine.ChoiceRunner.init(DATA.slice(0, 10), {
   summaryTitle: '🗾 猜面积',
   renderPrompt: q => `
     <div class="prompt-box" style="margin-bottom:20px">

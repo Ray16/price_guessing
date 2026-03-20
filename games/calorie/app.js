@@ -4,7 +4,7 @@ GameEngine.NumberRunner._fmt = function(v) {
   return Math.round(v).toLocaleString('zh-CN') + ' kcal';
 };
 
-GameEngine.NumberRunner.init(DATA, {
+GameEngine.NumberRunner.init(DATA.slice(0, 10), {
   symbol: '',
   decimals: 0,
   label: '这道食物有多少卡路里？（千卡）',

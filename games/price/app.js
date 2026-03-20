@@ -52,12 +52,12 @@ function renderThemes() {
 }
 
 // ── Game ──
-function padTo30(items) {
-  if (items.length >= 30) return items.slice(0, 30);
+function padTo10(items) {
+  if (items.length >= 10) return items.slice(0, 10);
   const result = [...items];
   const shuffled = shuffle([...items]);
   let si = 0;
-  while (result.length < 30) {
+  while (result.length < 10) {
     result.push(shuffled[si % shuffled.length]);
     si++;
   }
@@ -65,7 +65,7 @@ function padTo30(items) {
 }
 
 function startGame(theme) {
-  const paddedItems = padTo30(shuffle(theme.items));
+  const paddedItems = padTo10(shuffle(theme.items));
   currentTheme = { ...theme, items: paddedItems };
   currentIndex = 0;
   score = 0;

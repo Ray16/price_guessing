@@ -1,5 +1,5 @@
 window.GAME_ID = 'sort';
-const TOTAL = 25;
+const TOTAL = 10;
 let next = 1;
 let errors = 0;
 let startTime = null;

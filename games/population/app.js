@@ -35,7 +35,7 @@ GameEngine.NumberRunner._fmt = function(v) {
   return formatChinese(Math.round(v));
 };
 
-GameEngine.NumberRunner.init(DATA, {
+GameEngine.NumberRunner.init(DATA.slice(0, 10), {
   symbol: '',
   decimals: 0,
   label: '这个国家有多少人口？',
