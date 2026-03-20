@@ -51,8 +51,8 @@
         <div class="score-display">得分: <span id="score">0</span></div>
       </header>
       <main class="game-main">
-        <!-- Hidden YouTube player -->
-        <iframe id="yt-frame" allow="autoplay"></iframe>
+        <!-- YouTube player (must be a div; sized small but not hidden) -->
+        <div id="yt-frame" style="width:1px;height:1px;overflow:hidden;position:absolute;left:-9999px"></div>
 
         <div class="music-player">
           <button class="play-btn" id="play-btn">▶</button>
