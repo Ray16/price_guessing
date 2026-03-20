@@ -93,15 +93,15 @@ function submitGuess() {
   let points = 0;
   let emoji, message, grade;
   if (pctOff <= 5) {
-    points = 100; emoji = '🎯'; message = 'Spot on!'; grade = 'excellent';
+    points = 100; emoji = '🎯'; message = '太准了！'; grade = 'excellent';
   } else if (pctOff <= 15) {
-    points = 75; emoji = '🔥'; message = 'Very close!'; grade = 'excellent';
+    points = 75; emoji = '🔥'; message = '非常接近！'; grade = 'excellent';
   } else if (pctOff <= 30) {
-    points = 50; emoji = '👍'; message = 'Not bad!'; grade = 'good';
+    points = 50; emoji = '👍'; message = '还不错！'; grade = 'good';
   } else if (pctOff <= 50) {
-    points = 25; emoji = '😅'; message = 'Getting warmer...'; grade = 'good';
+    points = 25; emoji = '😅'; message = '有点偏了...'; grade = 'good';
   } else {
-    points = 0; emoji = '💸'; message = 'Way off!'; grade = 'off';
+    points = 0; emoji = '💸'; message = '差太远了！'; grade = 'off';
   }
 
   score += points;
@@ -114,13 +114,13 @@ function submitGuess() {
   $('#user-guess').textContent = formatPrice(guess, currentTheme.currency);
   $('#actual-price').textContent = formatPrice(actual, currentTheme.currency);
   $('#price-diff').textContent = formatPrice(diff, currentTheme.currency);
-  $('#result-message').textContent = `${message} (+${points} pts)`;
+  $('#result-message').textContent = `${message} (+${points} 分)`;
 
   const card = $('#result-card');
   card.className = `result-card ${grade}`;
 
   const isLast = currentIndex >= currentTheme.items.length - 1;
-  $('#btn-next').textContent = isLast ? 'See Results' : 'Next Item →';
+  $('#btn-next').textContent = isLast ? '查看结果' : '下一个 →';
 
   $('#result-section').classList.remove('hidden');
 }

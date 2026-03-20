@@ -2,7 +2,13 @@
   "permissions": {
     "allow": [
       "Bash(open /Users/rayzhu/Documents/fun_with_hebe/index.html)",
-      "Bash(git init:*)"
+      "Bash(git init:*)",
+      "Bash(git commit:*)",
+      "Bash(gh auth:*)",
+      "Bash(gh repo:*)",
+      "Bash(gh api:*)",
+      "Bash(git remote:*)",
+      "Bash(git add:*)"
     ]
   }
 }
