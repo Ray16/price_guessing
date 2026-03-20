@@ -34,15 +34,16 @@ function loadQuestion() {
   setHint('点击播放，听一听是哪首歌');
   setProgress(0);
 
-  // Pre-load audio
+  // Pre-load audio (no crossOrigin — NetEase doesn't send CORS headers)
   audio = new Audio();
-  audio.crossOrigin = 'anonymous';
   audio.src = audioUrl(q.id);
-  audio.preload = 'auto';
+  audio.preload = 'metadata';
 
-  audio.addEventListener('error', () => {
+  audio.addEventListener('error', (e) => {
+    const codes = { 1:'已终止', 2:'网络错误', 3:'解码错误', 4:'资源不支持' };
+    const msg = codes[audio.error?.code] || '未知错误';
     setNote('⚠️', false);
-    setHint('此曲暂时无法加载，请跳过');
+    setHint(`加载失败 (${msg})，请跳过`);
     document.getElementById('play-btn').disabled = true;
   });
 
@@ -63,19 +64,30 @@ document.getElementById('play-btn').addEventListener('click', () => {
   const q = questions[idx];
 
   if (audio.paused) {
-    // Seek to start position if it's a fresh play
-    if (audio.currentTime < q.start || audio.currentTime > q.start + CLIP_SECONDS) {
+    setHint('加载中…');
+    document.getElementById('play-btn').disabled = true;
+
+    const doPlay = () => {
       audio.currentTime = q.start;
+      audio.play().then(() => {
+        document.getElementById('play-btn').textContent = '⏸';
+        document.getElementById('play-btn').disabled = false;
+        setNote(NOTE_PLAYING, true);
+        setHint('播放中…');
+        startClipTimer(q);
+      }).catch((err) => {
+        document.getElementById('play-btn').disabled = false;
+        setNote('⚠️', false);
+        setHint(`播放失败: ${err.message}`);
+      });
+    };
+
+    // If already loaded enough, play immediately; otherwise wait
+    if (audio.readyState >= 1) {
+      doPlay();
+    } else {
+      audio.addEventListener('loadedmetadata', doPlay, { once: true });
     }
-    audio.play().then(() => {
-      document.getElementById('play-btn').textContent = '⏸';
-      setNote(NOTE_PLAYING, true);
-      setHint('播放中…');
-      startClipTimer(q);
-    }).catch(() => {
-      setNote('⚠️', false);
-      setHint('播放失败，请跳过');
-    });
   } else {
     audio.pause();
     document.getElementById('play-btn').textContent = '▶';
