@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>猜人口</title>
+  <link rel="stylesheet" href="../../shared/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div id="app">
+    <div id="game-screen" class="screen active">
+      <header class="game-header">
+        <a href="../../index.html" class="btn-back btn-home">← 返回</a>
+        <div class="progress"><span id="progress-text"></span></div>
+        <div class="score-display">得分: <span id="score">0</span></div>
+      </header>
+      <main class="game-main">
+        <div class="image-container" style="background:var(--surface-solid)">
+          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:200px;gap:8px">
+            <div style="font-size:3.5rem" id="item-flag"></div>
+            <div style="font-size:1.8rem;font-weight:800;text-align:center;padding:0 24px" id="item-name"></div>
+          </div>
+        </div>
+
+        <div id="guess-section" class="guess-section">
+          <label id="guess-label" for="price-input">这个国家有多少人口？（输入人数）</label>
+          <div class="input-row">
+            <input type="number" id="price-input" placeholder="100000000" min="0" max="2000000000" step="1000000" style="text-align:center">
+            <button id="btn-guess" class="btn-primary">确定</button>
+          </div>
+          <p style="color:var(--text-muted);font-size:0.82rem;margin-top:8px">提示：中国约14亿，即 1400000000</p>
+        </div>
+
+        <div id="result-section" class="result-section hidden">
+          <div id="result-card" class="result-card">
+            <div id="result-emoji" class="result-emoji"></div>
+            <div class="result-prices">
+              <div class="price-row">
+                <span class="price-label">你的猜测</span>
+                <span id="user-guess" class="price-value"></span>
+              </div>
+              <div class="price-row">
+                <span class="price-label">实际人口</span>
+                <span id="actual-price" class="price-value highlight"></span>
+              </div>
+              <div class="price-row">
+                <span class="price-label">差距</span>
+                <span id="price-diff" class="price-value"></span>
+              </div>
+            </div>
+            <p id="result-message" class="result-message"></p>
+          </div>
+          <div class="result-actions">
+            <button id="btn-next" class="btn-primary">下一个 →</button>
+            <a href="../../index.html" class="btn-secondary btn-home">返回首页</a>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <div id="summary-screen" class="screen">
+      <div class="summary-content">
+        <h2>游戏结束！</h2>
+        <div id="summary-theme" class="summary-theme"></div>
+        <div class="summary-stats">
+          <div class="stat"><span class="stat-value" id="final-score">0</span><span class="stat-label">得分</span></div>
+          <div class="stat"><span class="stat-value" id="items-played">0</span><span class="stat-label">题数</span></div>
+          <div class="stat"><span class="stat-value" id="avg-accuracy">0%</span><span class="stat-label">准确率</span></div>
+        </div>
+        <div class="summary-actions">
+          <button class="btn-primary" onclick="location.reload()">再玩一次</button>
+          <a href="../../index.html" class="btn-secondary">返回首页</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="../../shared/engine.js"></script>
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

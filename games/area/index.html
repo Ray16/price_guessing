@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>猜面积</title>
+  <link rel="stylesheet" href="../../shared/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div id="app">
+    <div id="game-screen" class="screen active">
+      <header class="game-header">
+        <a href="../../index.html" class="btn-back btn-home">← 返回</a>
+        <div class="progress"><span id="progress-text"></span></div>
+        <div class="score-display">得分: <span id="score">0</span></div>
+      </header>
+      <main class="game-main">
+        <div id="prompt-area"></div>
+        <div id="choices-container"></div>
+
+        <div id="result-section" class="result-section hidden">
+          <div id="result-card" class="result-card">
+            <div id="result-emoji" class="result-emoji"></div>
+            <p id="result-message" class="result-message"></p>
+            <div id="area-reveal" style="margin-top:14px;font-size:0.9rem;color:var(--text-muted)"></div>
+          </div>
+          <div class="result-actions">
+            <button id="btn-next" class="btn-primary">下一个 →</button>
+            <a href="../../index.html" class="btn-secondary btn-home">返回首页</a>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <div id="summary-screen" class="screen">
+      <div class="summary-content">
+        <h2>游戏结束！</h2>
+        <div id="summary-theme" class="summary-theme"></div>
+        <div class="summary-stats">
+          <div class="stat"><span class="stat-value" id="final-score">0</span><span class="stat-label">得分</span></div>
+          <div class="stat"><span class="stat-value" id="items-played">0</span><span class="stat-label">题数</span></div>
+          <div class="stat"><span class="stat-value" id="avg-accuracy">0%</span><span class="stat-label">正确率</span></div>
+        </div>
+        <div class="summary-actions">
+          <button class="btn-primary" onclick="location.reload()">再玩一次</button>
+          <a href="../../index.html" class="btn-secondary">返回首页</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="../../shared/engine.js"></script>
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

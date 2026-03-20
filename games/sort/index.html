@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>数字排序</title>
+  <link rel="stylesheet" href="../../shared/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div id="app">
+    <div id="game-screen" class="screen active">
+      <header class="game-header">
+        <a href="../../index.html" class="btn-back">← 返回</a>
+        <div class="progress">下一个: <span id="next-num" style="color:var(--warning);font-weight:800">1</span></div>
+        <div class="score-display">⏱ <span id="timer">0.0</span>s</div>
+      </header>
+      <main class="game-main" style="padding:16px 12px">
+        <p style="text-align:center;color:var(--text-muted);font-size:0.9rem;margin-bottom:12px">按顺序点击 1 到 25，越快越好！</p>
+        <div id="sort-arena" class="sort-arena"></div>
+        <div id="error-msg" style="text-align:center;color:var(--danger);font-size:0.85rem;margin-top:10px;min-height:20px"></div>
+      </main>
+    </div>
+
+    <div id="summary-screen" class="screen">
+      <div class="summary-content">
+        <h2>完成！🎉</h2>
+        <div class="summary-theme">🔢 数字排序</div>
+        <div class="summary-stats">
+          <div class="stat"><span class="stat-value" id="final-time">0</span><span class="stat-label">完成时间(s)</span></div>
+          <div class="stat"><span class="stat-value" id="final-errors">0</span><span class="stat-label">错误次数</span></div>
+          <div class="stat"><span class="stat-value" id="final-score">0</span><span class="stat-label">得分</span></div>
+        </div>
+        <div class="summary-actions">
+          <button class="btn-primary" onclick="location.reload()">再玩一次</button>
+          <a href="../../index.html" class="btn-secondary">返回首页</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="../../shared/engine.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>记忆翻牌</title>
+  <link rel="stylesheet" href="../../shared/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    .memory-grid { grid-template-columns: repeat(4, 1fr); }
+    .memory-info { display: flex; gap: 24px; justify-content: center; margin-bottom: 16px; font-size: 0.9rem; color: var(--text-muted); font-weight: 600; }
+    .memory-info span { color: var(--text); }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div id="game-screen" class="screen active">
+      <header class="game-header">
+        <a href="../../index.html" class="btn-back">← 返回</a>
+        <div class="progress" id="pairs-info">已匹配: <span id="matched-count">0</span> / 8</div>
+        <div class="score-display">步数: <span id="move-count">0</span></div>
+      </header>
+      <main class="game-main" style="padding:16px 12px">
+        <div class="memory-info">
+          <div>用时: <span id="elapsed-time">0</span>s</div>
+          <div>翻牌: <span id="flip-count">0</span> 次</div>
+        </div>
+        <div id="memory-grid" class="memory-grid"></div>
+      </main>
+    </div>
+
+    <div id="summary-screen" class="screen">
+      <div class="summary-content">
+        <h2>全部配对！🎉</h2>
+        <div class="summary-theme">🃏 记忆翻牌</div>
+        <div class="summary-stats">
+          <div class="stat"><span class="stat-value" id="final-time">0</span><span class="stat-label">秒</span></div>
+          <div class="stat"><span class="stat-value" id="final-moves">0</span><span class="stat-label">翻牌次数</span></div>
+          <div class="stat"><span class="stat-value" id="final-score">0</span><span class="stat-label">得分</span></div>
+        </div>
+        <div class="summary-actions">
+          <button class="btn-primary" onclick="location.reload()">再玩一次</button>
+          <a href="../../index.html" class="btn-secondary">返回首页</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="../../shared/engine.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

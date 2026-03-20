@@ -1,0 +1,16 @@
+const GAMES = [
+  { id: 'price',      name: '猜价格',   emoji: '💰', desc: '商品多少钱？一猜就知道',   path: 'games/price/' },
+  { id: 'year',       name: '猜年份',   emoji: '📅', desc: '这张老照片是哪一年拍的？',  path: 'games/year/' },
+  { id: 'calorie',    name: '猜卡路里', emoji: '🍽️', desc: '这顿饭有多少卡路里？',     path: 'games/calorie/' },
+  { id: 'distance',   name: '猜距离',   emoji: '🗺️', desc: '两座城市相距多少公里？',   path: 'games/distance/' },
+  { id: 'population', name: '猜人口',   emoji: '🌍', desc: '这个国家有多少人口？',     path: 'games/population/' },
+  { id: 'rating',     name: '猜评分',   emoji: '🎬', desc: '这部电影豆瓣几分？',       path: 'games/rating/' },
+  { id: 'color',      name: '猜颜色',   emoji: '🎨', desc: '十六进制颜色代码对应哪个色块？', path: 'games/color/' },
+  { id: 'area',       name: '猜面积',   emoji: '🗾', desc: '哪个国家面积更大？',       path: 'games/area/' },
+  { id: 'reaction',   name: '反应测试', emoji: '⚡', desc: '看到绿色就点击，测测你的反应速度', path: 'games/reaction/' },
+  { id: 'memory',     name: '记忆翻牌', emoji: '🃏', desc: '翻开匹配的卡牌，考验你的记忆力', path: 'games/memory/' },
+  { id: 'sort',       name: '数字排序', emoji: '🔢', desc: '按顺序点击1到25，越快越好', path: 'games/sort/' },
+  { id: 'quote',      name: '谁说的',   emoji: '💬', desc: '这句名言出自哪位名人？',   path: 'games/quote/' },
+  { id: 'headline',   name: '真假新闻', emoji: '📰', desc: '这条新闻标题是真实的吗？', path: 'games/headline/' },
+  { id: 'pitch',      name: '高低音',   emoji: '🎵', desc: '哪个音调更高？训练你的音感', path: 'games/pitch/' },
+];
