@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(open /Users/rayzhu/Documents/fun_with_hebe/index.html)",
+      "Bash(git init:*)"
+    ]
+  }
+}
