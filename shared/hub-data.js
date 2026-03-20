@@ -2,7 +2,6 @@ const GAMES = [
   { id: 'price',      name: '猜价格',   emoji: '💰', desc: '商品多少钱？一猜就知道',   path: 'games/price/' },
   { id: 'year',       name: '猜年份',   emoji: '📅', desc: '这张老照片是哪一年拍的？',  path: 'games/year/' },
   { id: 'calorie',    name: '猜卡路里', emoji: '🍽️', desc: '这顿饭有多少卡路里？',     path: 'games/calorie/' },
-  { id: 'distance',   name: '猜距离',   emoji: '🗺️', desc: '两座城市相距多少公里？',   path: 'games/distance/' },
   { id: 'population', name: '猜人口',   emoji: '🌍', desc: '这个国家有多少人口？',     path: 'games/population/' },
   { id: 'rating',     name: '猜评分',   emoji: '🎬', desc: '这部电影豆瓣几分？',       path: 'games/rating/' },
   { id: 'color',      name: '猜颜色',   emoji: '🎨', desc: '十六进制颜色代码对应哪个色块？', path: 'games/color/' },

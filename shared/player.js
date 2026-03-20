@@ -1,7 +1,7 @@
-// Player & Weekly Ranking System
-const Player = (() => {
-  const KEY = 'pgData_v2';
+// Player & Weekly Ranking System — Firebase Realtime Database
+// Requires shared/firebase-config.js to be loaded first
 
+const Player = (() => {
   function getWeekKey() {
     const now = new Date();
     const d = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()));
@@ -12,41 +12,83 @@ const Player = (() => {
     return `${d.getUTCFullYear()}-W${week}`;
   }
 
-  const emptyPlayer = () => ({ total: 0, games: {} });
+  // Current player stored locally (device preference)
+  const LOCAL_KEY = 'pg_current_player';
 
-  function load() {
-    try {
-      const raw = localStorage.getItem(KEY);
-      const data = raw ? JSON.parse(raw) : null;
-      const week = getWeekKey();
-      if (!data || data.weekKey !== week) {
-        return { weekKey: week, current: data?.current || null, Ray: emptyPlayer(), Hebe: emptyPlayer() };
-      }
-      return data;
-    } catch(e) {
-      return { weekKey: getWeekKey(), current: null, Ray: emptyPlayer(), Hebe: emptyPlayer() };
-    }
+  function dbUrl(path) {
+    return `${FIREBASE_CONFIG.databaseURL}/${path}.json`;
   }
 
-  function save(d) { localStorage.setItem(KEY, JSON.stringify(d)); }
-
   return {
-    getCurrent() { return load().current; },
-    setCurrent(name) { const d = load(); d.current = name; save(d); },
-    saveScore(gameId, score) {
-      const d = load();
-      const p = d.current;
-      if (!p || !d[p]) return;
-      const prev = d[p].games[gameId] || 0;
-      // Only update if new score is higher for that game this week
-      d[p].games[gameId] = Math.max(prev, score);
-      // Recompute total
-      d[p].total = Object.values(d[p].games).reduce((a, b) => a + b, 0);
-      save(d);
+    getCurrent() {
+      return localStorage.getItem(LOCAL_KEY);
     },
-    getRankings() {
-      const d = load();
-      return { Ray: d.Ray, Hebe: d.Hebe, weekKey: d.weekKey };
-    }
+
+    setCurrent(name) {
+      localStorage.setItem(LOCAL_KEY, name);
+    },
+
+    async saveScore(gameId, score) {
+      const player = this.getCurrent();
+      if (!player) return;
+      const week = getWeekKey();
+      const path = `rankings/${week}/${player}/games/${gameId}`;
+
+      // Read current score first, only update if higher
+      try {
+        const res = await fetch(dbUrl(path));
+        const current = await res.json();
+        if (current !== null && current >= score) return;
+        await fetch(dbUrl(path), {
+          method: 'PUT',
+          body: JSON.stringify(score),
+        });
+        // Update total
+        await this._updateTotal(player, week);
+      } catch (e) {
+        console.warn('Firebase save failed, falling back to localStorage', e);
+        _localSave(player, gameId, score);
+      }
+    },
+
+    async _updateTotal(player, week) {
+      try {
+        const res = await fetch(dbUrl(`rankings/${week}/${player}/games`));
+        const games = await res.json();
+        if (!games) return;
+        const total = Object.values(games).reduce((a, b) => a + b, 0);
+        await fetch(dbUrl(`rankings/${week}/${player}/total`), {
+          method: 'PUT',
+          body: JSON.stringify(total),
+        });
+      } catch (e) { /* silent */ }
+    },
+
+    async getRankings() {
+      const week = getWeekKey();
+      try {
+        const res = await fetch(dbUrl(`rankings/${week}`));
+        const data = await res.json();
+        return {
+          weekKey: week,
+          Ray:  { total: data?.Ray?.total  || 0, games: data?.Ray?.games  || {} },
+          Hebe: { total: data?.Hebe?.total || 0, games: data?.Hebe?.games || {} },
+        };
+      } catch (e) {
+        return { weekKey: week, Ray: { total: 0, games: {} }, Hebe: { total: 0, games: {} } };
+      }
+    },
   };
+
+  // localStorage fallback
+  function _localSave(player, gameId, score) {
+    const key = 'pg_local_scores';
+    const week = getWeekKey();
+    let data = {};
+    try { data = JSON.parse(localStorage.getItem(key) || '{}'); } catch(e) {}
+    if (data.week !== week) data = { week, Ray: {}, Hebe: {} };
+    if (!data[player]) data[player] = {};
+    data[player][gameId] = Math.max(data[player][gameId] || 0, score);
+    localStorage.setItem(key, JSON.stringify(data));
+  }
 })();
