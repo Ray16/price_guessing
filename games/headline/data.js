@@ -1,62 +1,32 @@
 const DATA = [
-  {
-    prompt: '日本科学家成功让猪长出人类肾脏',
-    correctIdx: 0,
-    choices: [{ label: '✅ 真实新闻' }, { label: '❌ 假新闻' }],
-    explain: '真实：2023年，日本东京大学研究团队成功在猪体内培育出含有人类细胞的肾脏，是器官移植研究的重大突破。'
-  },
-  {
-    prompt: '研究表明：每天喝咖啡能让人增高5厘米',
-    correctIdx: 1,
-    choices: [{ label: '✅ 真实新闻' }, { label: '❌ 假新闻' }],
-    explain: '假新闻：咖啡因实际上可能抑制青少年骨骼发育，并无增高效果。这是典型的健康谣言。'
-  },
-  {
-    prompt: '科学家在火星上发现了液态水的证据',
-    correctIdx: 0,
-    choices: [{ label: '✅ 真实新闻' }, { label: '❌ 假新闻' }],
-    explain: '真实：2018年，欧洲航天局的火星快车号探测器在火星南极冰盖下探测到约20公里宽的液态水湖。'
-  },
-  {
-    prompt: '苹果公司宣布将推出折叠屏iPhone并搭配全息投影键盘',
-    correctIdx: 1,
-    choices: [{ label: '✅ 真实新闻' }, { label: '❌ 假新闻' }],
-    explain: '假新闻：截至2024年，苹果尚未正式发布折叠屏iPhone，全息键盘为虚构功能。'
-  },
-  {
-    prompt: 'ChatGPT在发布后5天内用户数突破100万',
-    correctIdx: 0,
-    choices: [{ label: '✅ 真实新闻' }, { label: '❌ 假新闻' }],
-    explain: '真实：ChatGPT于2022年11月30日发布，仅用5天时间就达到了100万用户，成为史上增长最快的消费类应用之一。'
-  },
-  {
-    prompt: '英国女王伊丽莎白二世驾崩前一天还在处理国事',
-    correctIdx: 0,
-    choices: [{ label: '✅ 真实新闻' }, { label: '❌ 假新闻' }],
-    explain: '真实：2022年9月6日，伊丽莎白二世在苏格兰巴尔莫勒尔堡接见了新任首相，两天后即2022年9月8日辞世。'
-  },
-  {
-    prompt: '中国科学家研制出可在零下40度正常工作的锂电池',
-    correctIdx: 0,
-    choices: [{ label: '✅ 真实新闻' }, { label: '❌ 假新闻' }],
-    explain: '真实：中国多所高校已研究出可在极低温环境下工作的新型锂电池，对新能源汽车在寒冷地区的应用有重要意义。'
-  },
-  {
-    prompt: '科学家证实：看恐怖片能有效减肥，每小时燃烧200卡路里',
-    correctIdx: 1,
-    choices: [{ label: '✅ 真实新闻' }, { label: '❌ 假新闻' }],
-    explain: '假新闻：虽然紧张情绪确实会略微提高心率，但每小时燃烧200卡路里的说法严重夸大，真实数字远低于此。'
-  },
-  {
-    prompt: '全球首个AI生成的画作以43.2万美元在拍卖会成交',
-    correctIdx: 0,
-    choices: [{ label: '✅ 真实新闻' }, { label: '❌ 假新闻' }],
-    explain: '真实：2018年，由AI算法生成的画作《埃德蒙·德·贝拉米肖像》在佳士得拍卖行以43.2万美元成交，震惊艺术界。'
-  },
-  {
-    prompt: '研究证实：人类每天只使用大脑的10%',
-    correctIdx: 1,
-    choices: [{ label: '✅ 真实新闻' }, { label: '❌ 假新闻' }],
-    explain: '假新闻：这是广为流传的都市传说。神经科学研究表明，人类几乎使用大脑的所有区域，只是不同时间使用不同区域。'
-  },
+  { prompt: '日本科学家成功让猪长出人类肾脏', correctIdx: 0, choices: [{label:'✅ 真实新闻'},{label:'❌ 假新闻'}], explain: '2023年真实研究，旨在解决器官短缺问题' },
+  { prompt: '研究发现每天喝咖啡可延长寿命5年', correctIdx: 1, choices: [{label:'✅ 真实新闻'},{label:'❌ 假新闻'}], explain: '夸大其词，咖啡有一定健康益处但不能延寿5年' },
+  { prompt: '中国成为全球最大新能源汽车市场', correctIdx: 0, choices: [{label:'✅ 真实新闻'},{label:'❌ 假新闻'}], explain: '2023年中国新能源车销量全球第一' },
+  { prompt: '科学家证明人类可以像蜘蛛侠一样爬墙', correctIdx: 1, choices: [{label:'✅ 真实新闻'},{label:'❌ 假新闻'}], explain: '人类体重太重，仿壁虎材料无法支撑真实人体' },
+  { prompt: 'ChatGPT推出四个月用户破亿，成史上最快', correctIdx: 0, choices: [{label:'✅ 真实新闻'},{label:'❌ 假新闻'}], explain: '2023年1月ChatGPT月活用户突破1亿' },
+  { prompt: '研究证明听莫扎特音乐能让婴儿变聪明', correctIdx: 1, choices: [{label:'✅ 真实新闻'},{label:'❌ 假新闻'}], explain: '"莫扎特效应"已被多项研究推翻' },
+  { prompt: '马斯克收购Twitter并将其更名为X', correctIdx: 0, choices: [{label:'✅ 真实新闻'},{label:'❌ 假新闻'}], explain: '2023年马斯克完成收购并更名' },
+  { prompt: '苹果公司宣布将在2025年前停止生产iPhone', correctIdx: 1, choices: [{label:'✅ 真实新闻'},{label:'❌ 假新闻'}], explain: '纯属虚构' },
+  { prompt: '日本推出可以与人对话的AI伴侣机器人并开始租赁', correctIdx: 0, choices: [{label:'✅ 真实新闻'},{label:'❌ 假新闻'}], explain: 'AI伴侣/陪伴机器人产品在日本真实存在' },
+  { prompt: '人类发现第二个地球，可在2050年前移民', correctIdx: 1, choices: [{label:'✅ 真实新闻'},{label:'❌ 假新闻'}], explain: '尚未发现，2050年移民更是遥不可及' },
+  { prompt: '中国天眼（FAST）接收到疑似外星文明信号', correctIdx: 1, choices: [{label:'✅ 真实新闻'},{label:'❌ 假新闻'}], explain: '曾有报道但均被证实为人为干扰信号' },
+  { prompt: '全球首例猪心脏移植人体手术在美国完成', correctIdx: 0, choices: [{label:'✅ 真实新闻'},{label:'❌ 假新闻'}], explain: '2022年1月在美国马里兰大学成功完成' },
+  { prompt: '谷歌宣布量子计算机已实现"量子霸权"', correctIdx: 0, choices: [{label:'✅ 真实新闻'},{label:'❌ 假新闻'}], explain: '2019年谷歌在《自然》杂志宣布此成果' },
+  { prompt: '科学家研发出可以清除记忆的药物并上市销售', correctIdx: 1, choices: [{label:'✅ 真实新闻'},{label:'❌ 假新闻'}], explain: '研究尚在实验室阶段，未上市' },
+  { prompt: '中国高铁里程突破4万公里，居全球第一', correctIdx: 0, choices: [{label:'✅ 真实新闻'},{label:'❌ 假新闻'}], explain: '中国高铁运营里程长期居全球首位' },
+  { prompt: '研究发现玩电子游戏每天8小时对身体有益', correctIdx: 1, choices: [{label:'✅ 真实新闻'},{label:'❌ 假新闻'}], explain: '过度游戏有害健康，无正规研究支持此结论' },
+  { prompt: 'SpaceX星舰完成全球首次轨道级试飞', correctIdx: 0, choices: [{label:'✅ 真实新闻'},{label:'❌ 假新闻'}], explain: '2024年星舰完成多次轨道测试' },
+  { prompt: '科学家发现人类可以通过呼吸传输思想', correctIdx: 1, choices: [{label:'✅ 真实新闻'},{label:'❌ 假新闻'}], explain: '纯属无稽之谈' },
+  { prompt: '比尔·盖茨宣布将捐出99%个人财富', correctIdx: 0, choices: [{label:'✅ 真实新闻'},{label:'❌ 假新闻'}], explain: '盖茨已签署"捐赠誓言"承诺捐出绝大多数财富' },
+  { prompt: '联合国宣布2030年全面禁止使用手机', correctIdx: 1, choices: [{label:'✅ 真实新闻'},{label:'❌ 假新闻'}], explain: '联合国从未有此计划' },
+  { prompt: '中国成功研发全球首款核聚变商业发电机', correctIdx: 1, choices: [{label:'✅ 真实新闻'},{label:'❌ 假新闻'}], explain: '商业核聚变仍在研发中，尚未实现' },
+  { prompt: '苹果公司市值突破3万亿美元', correctIdx: 0, choices: [{label:'✅ 真实新闻'},{label:'❌ 假新闻'}], explain: '2022年苹果成为首家市值破3万亿的公司' },
+  { prompt: '科学家发现吃辣椒可以使人智商提高20%', correctIdx: 1, choices: [{label:'✅ 真实新闻'},{label:'❌ 假新闻'}], explain: '没有任何证据支持此说法' },
+  { prompt: '深圳一企业推出每周工作3天制度并已普及', correctIdx: 1, choices: [{label:'✅ 真实新闻'},{label:'❌ 假新闻'}], explain: '个别试点存在但远未普及' },
+  { prompt: '欧洲核子研究中心（CERN）重启大型强子对撞机', correctIdx: 0, choices: [{label:'✅ 真实新闻'},{label:'❌ 假新闻'}], explain: '2022年CERN重启LHC进行第三轮运行' },
+  { prompt: '研究发现人类大脑可以在死后继续工作24小时', correctIdx: 1, choices: [{label:'✅ 真实新闻'},{label:'❌ 假新闻'}], explain: '2023年有猪脑细胞复活研究，但非人脑' },
+  { prompt: '抖音在美国用户数突破1.5亿', correctIdx: 0, choices: [{label:'✅ 真实新闻'},{label:'❌ 假新闻'}], explain: '2023年TikTok宣布美国月活达1.5亿' },
+  { prompt: '科学家证实地球将在2100年变成火星一样荒芜', correctIdx: 1, choices: [{label:'✅ 真实新闻'},{label:'❌ 假新闻'}], explain: '气候变化严峻但无科学预测称地球会变成火星' },
+  { prompt: '全球首个AI生成的艺术作品在拍卖会成交超百万', correctIdx: 0, choices: [{label:'✅ 真实新闻'},{label:'❌ 假新闻'}], explain: '2018年AI画作《贝拉米肖像》拍出43.25万美元' },
+  { prompt: '世界卫生组织宣布"过度使用手机"为精神疾病', correctIdx: 1, choices: [{label:'✅ 真实新闻'},{label:'❌ 假新闻'}], explain: 'WHO将游戏障碍纳入ICD-11，但非"手机使用"' },
 ];

@@ -19,7 +19,7 @@ function generateQuestions(n = 10) {
   });
 }
 
-GameEngine.ChoiceRunner.init(generateQuestions(), {
+GameEngine.ChoiceRunner.init(generateQuestions(30), {
   summaryTitle: '🎨 猜颜色',
   swatchBtn: true,
   renderPrompt: q => `
