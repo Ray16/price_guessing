@@ -3,6 +3,7 @@ window.GAME_ID = 'music';
 const questions = GameEngine.utils.shuffle([...DATA]).slice(0, 10);
 let idx = 0, score = 0, correct = 0, streak = 0;
 let audio = null, progressTimer = null;
+let currentPreviewUrl = null; // fetched async; Audio created only on user tap
 
 const CLIP_SECONDS = 30;
 const NOTE_PLAYING = '🎶';
@@ -18,17 +19,14 @@ function setProgress(pct) {
   document.getElementById('clip-progress').style.width = pct + '%';
 }
 
-// ── Fetch 30-second preview URL from iTunes Search API ──
 async function fetchPreviewUrl(name, artist) {
   const query = encodeURIComponent(name + ' ' + artist);
   const res = await fetch(
     `https://itunes.apple.com/search?term=${query}&media=music&limit=10&country=CN`
   );
   const data = await res.json();
-  // Prefer studio version over live/remix
   const preferred = data.results.find(r =>
-    r.previewUrl &&
-    !/(live|现场|remix|翻唱)/i.test(r.trackName)
+    r.previewUrl && !/(live|现场|remix|翻唱)/i.test(r.trackName)
   );
   const fallback = data.results.find(r => r.previewUrl);
   return (preferred || fallback)?.previewUrl || null;
@@ -37,6 +35,7 @@ async function fetchPreviewUrl(name, artist) {
 // ── Load question ──
 async function loadQuestion() {
   stopAudio();
+  currentPreviewUrl = null;
   const q = questions[idx];
   document.getElementById('progress-text').textContent = `${idx + 1} / ${questions.length}`;
   document.getElementById('result-section').classList.add('hidden');
@@ -46,7 +45,7 @@ async function loadQuestion() {
   setHint('加载中…');
   setProgress(0);
 
-  // Render choices immediately
+  // Render choices immediately while URL loads in background
   const shuffled = GameEngine.utils.shuffle([...q.choices]);
   document.getElementById('choices-container').innerHTML =
     `<div class="choices">${shuffled.map(c =>
@@ -56,60 +55,60 @@ async function loadQuestion() {
     btn.addEventListener('click', () => pick(btn.dataset.choice, q));
   });
 
-  // Fetch preview URL from iTunes
-  let previewUrl;
   try {
-    previewUrl = await fetchPreviewUrl(q.name, q.artist);
+    const url = await fetchPreviewUrl(q.name, q.artist);
+    if (!url) {
+      setNote('⚠️', false);
+      setHint('未找到音频，请跳过');
+      return;
+    }
+    currentPreviewUrl = url;
+    document.getElementById('play-btn').disabled = false;
+    setHint('点击播放，听一听是哪首歌');
   } catch (e) {
     setNote('⚠️', false);
     setHint('网络错误，请跳过');
-    return;
   }
-
-  if (!previewUrl) {
-    setNote('⚠️', false);
-    setHint('未找到音频，请跳过');
-    return;
-  }
-
-  audio = new Audio(previewUrl);
-
-  audio.addEventListener('error', () => {
-    setNote('⚠️', false);
-    setHint('加载失败，请跳过');
-    document.getElementById('play-btn').disabled = true;
-  });
-
-  audio.addEventListener('canplay', () => {
-    document.getElementById('play-btn').disabled = false;
-    setHint('点击播放，听一听是哪首歌');
-  }, { once: true });
-
-  audio.load();
 }
 
 // ── Play / Pause ──
+// Audio is created inside the click handler so iOS Safari allows playback
 document.getElementById('play-btn').addEventListener('click', () => {
-  if (!audio) return;
-
-  if (audio.paused) {
-    audio.currentTime = 0;
-    audio.play().then(() => {
-      document.getElementById('play-btn').textContent = '⏸';
-      setNote(NOTE_PLAYING, true);
-      setHint('播放中…');
-      startClipTimer();
-    }).catch(err => {
-      setNote('⚠️', false);
-      setHint(`播放失败: ${err.message}`);
-    });
-  } else {
+  // Pause
+  if (audio && !audio.paused) {
     audio.pause();
     document.getElementById('play-btn').textContent = '▶';
     setNote(NOTE_IDLE, false);
     setHint('已暂停，点击继续');
     clearInterval(progressTimer);
+    return;
   }
+
+  if (!currentPreviewUrl) return;
+
+  // Create new Audio inside user gesture (required by iOS Safari)
+  if (!audio) {
+    audio = new Audio(currentPreviewUrl);
+    audio.addEventListener('error', () => {
+      setNote('⚠️', false);
+      setHint('播放失败，请跳过');
+    });
+  }
+
+  setHint('加载中…');
+  document.getElementById('play-btn').disabled = true;
+
+  audio.play().then(() => {
+    document.getElementById('play-btn').textContent = '⏸';
+    document.getElementById('play-btn').disabled = false;
+    setNote(NOTE_PLAYING, true);
+    setHint('播放中…');
+    startClipTimer();
+  }).catch(err => {
+    document.getElementById('play-btn').disabled = false;
+    setNote('⚠️', false);
+    setHint(`播放失败: ${err.message}`);
+  });
 });
 
 function startClipTimer() {
