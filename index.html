@@ -7,19 +7,113 @@
   <link rel="stylesheet" href="shared/style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    /* Player selection overlay */
+    .player-overlay {
+      position: fixed; inset: 0; background: rgba(10,10,18,0.97);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      z-index: 100; gap: 24px;
+    }
+    .player-overlay h2 { font-size: 1.8rem; font-weight: 800; margin-bottom: 8px; }
+    .player-overlay p { color: var(--text-muted); margin-bottom: 16px; }
+    .player-cards { display: flex; gap: 20px; }
+    .player-card {
+      background: var(--surface); border: 2px solid var(--border);
+      border-radius: var(--radius-lg); padding: 32px 40px; cursor: pointer;
+      text-align: center; transition: all 0.25s; min-width: 160px;
+    }
+    .player-card:hover { border-color: var(--primary); transform: translateY(-4px); box-shadow: 0 8px 32px rgba(124,108,240,0.2); }
+    .player-avatar { font-size: 4rem; margin-bottom: 12px; }
+    .player-name { font-size: 1.3rem; font-weight: 700; }
+
+    /* Hub header with player badge */
+    .hub-top {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      padding: 40px 32px 0; max-width: 1280px; margin: 0 auto; width: 100%;
+    }
+    .player-badge {
+      display: flex; align-items: center; gap: 10px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 100px; padding: 8px 16px; cursor: pointer;
+      font-size: 0.9rem; font-weight: 600; transition: border-color 0.2s;
+      white-space: nowrap;
+    }
+    .player-badge:hover { border-color: var(--primary); }
+    .ranking-btn {
+      background: linear-gradient(135deg, #7c6cf0, #9488ff);
+      border: none; border-radius: 100px; padding: 10px 20px;
+      color: #fff; font-size: 0.9rem; font-weight: 600;
+      cursor: pointer; font-family: inherit; white-space: nowrap;
+      transition: opacity 0.2s;
+    }
+    .ranking-btn:hover { opacity: 0.85; }
+    .hub-actions { display: flex; gap: 10px; align-items: center; }
+  </style>
 </head>
 <body>
+  <!-- Player Selection Overlay -->
+  <div class="player-overlay" id="player-overlay">
+    <h2>你是哪位玩家？</h2>
+    <p>每周积分榜会记录你的最高分</p>
+    <div class="player-cards">
+      <div class="player-card" onclick="selectPlayer('Ray')">
+        <div class="player-avatar">👦</div>
+        <div class="player-name">Ray</div>
+      </div>
+      <div class="player-card" onclick="selectPlayer('Hebe')">
+        <div class="player-avatar">👧</div>
+        <div class="player-name">Hebe</div>
+      </div>
+    </div>
+  </div>
+
   <div id="app">
     <div class="screen active" style="flex-direction:column">
-      <header class="home-header">
+      <div class="hub-top">
+        <div></div>
+        <div class="hub-actions">
+          <button class="ranking-btn" onclick="location.href='ranking.html'">🏆 本周排行</button>
+          <div class="player-badge" id="player-badge" onclick="switchPlayer()">
+            <span id="badge-avatar">👤</span>
+            <span id="badge-name">选择玩家</span>
+          </div>
+        </div>
+      </div>
+      <header class="home-header" style="padding-top:16px">
         <h1>小游戏合集</h1>
         <p class="subtitle">选一个游戏，开始玩吧！</p>
       </header>
       <div id="game-grid" class="game-grid"></div>
     </div>
   </div>
+
   <script src="shared/hub-data.js"></script>
+  <script src="shared/player.js"></script>
   <script>
+    const AVATARS = { Ray: '👦', Hebe: '👧' };
+
+    function updateBadge(name) {
+      document.getElementById('badge-avatar').textContent = AVATARS[name] || '👤';
+      document.getElementById('badge-name').textContent = name || '选择玩家';
+    }
+
+    function selectPlayer(name) {
+      Player.setCurrent(name);
+      document.getElementById('player-overlay').style.display = 'none';
+      updateBadge(name);
+    }
+
+    function switchPlayer() {
+      document.getElementById('player-overlay').style.display = 'flex';
+    }
+
+    // Init
+    const current = Player.getCurrent();
+    if (current) {
+      document.getElementById('player-overlay').style.display = 'none';
+      updateBadge(current);
+    }
+
     document.getElementById('game-grid').innerHTML = GAMES.map((g, i) => `
       <a class="game-card" href="${g.path}" style="animation-delay:${i*0.05}s">
         <div class="game-card-emoji">${g.emoji}</div>

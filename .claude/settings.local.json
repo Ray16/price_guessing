@@ -9,7 +9,11 @@
       "Bash(gh api:*)",
       "Bash(git remote:*)",
       "Bash(git add:*)",
-      "Bash(curl -s -o /dev/null -w \"%{http_code}\" https://ray16.github.io/price_guessing/)"
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" https://ray16.github.io/price_guessing/)",
+      "Bash(for dir:*)",
+      "Bash(do echo:*)",
+      "Read(//Users/rayzhu/Documents/fun_with_hebe/**)",
+      "Bash(done)"
     ]
   }
 }

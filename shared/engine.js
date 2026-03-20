@@ -135,6 +135,9 @@ const GameEngine = (() => {
       $('#items-played').textContent = this._q.length;
       $('#avg-accuracy').textContent = Math.round(avg) + '%';
       if ($('#summary-theme') && this._cfg.summaryTitle) $('#summary-theme').textContent = this._cfg.summaryTitle;
+      if (typeof Player !== 'undefined' && typeof window.GAME_ID !== 'undefined') {
+        Player.saveScore(window.GAME_ID, this._score);
+      }
       screens.show('#summary-screen');
     }
   };
@@ -213,6 +216,9 @@ const GameEngine = (() => {
       $('#items-played').textContent = this._q.length;
       $('#avg-accuracy').textContent = Math.round(this._correct / this._q.length * 100) + '%';
       if ($('#summary-theme') && this._cfg.summaryTitle) $('#summary-theme').textContent = this._cfg.summaryTitle;
+      if (typeof Player !== 'undefined' && typeof window.GAME_ID !== 'undefined') {
+        Player.saveScore(window.GAME_ID, this._score);
+      }
       screens.show('#summary-screen');
     }
   };
