@@ -12,4 +12,5 @@ const GAMES = [
   { id: 'quote',      name: '谁说的',   emoji: '💬', desc: '这句名言出自哪位名人？',   path: 'games/quote/' },
   { id: 'headline',   name: '真假新闻', emoji: '📰', desc: '这条新闻标题是真实的吗？', path: 'games/headline/' },
   { id: 'pitch',      name: '高低音',   emoji: '🎵', desc: '哪个音调更高？训练你的音感', path: 'games/pitch/' },
+  { id: 'music',      name: '听歌识曲', emoji: '🎶', desc: '听一段旋律，猜出歌名！',      path: 'games/music/' },
 ];
