@@ -1,4 +1,5 @@
 // Price Guesser - Main App Logic
+window.GAME_ID = 'price';
 
 const $ = (sel) => document.querySelector(sel);
 const show = (id) => {
@@ -51,8 +52,21 @@ function renderThemes() {
 }
 
 // ── Game ──
+function padTo30(items) {
+  if (items.length >= 30) return items.slice(0, 30);
+  const result = [...items];
+  const shuffled = shuffle([...items]);
+  let si = 0;
+  while (result.length < 30) {
+    result.push(shuffled[si % shuffled.length]);
+    si++;
+  }
+  return result;
+}
+
 function startGame(theme) {
-  currentTheme = { ...theme, items: shuffle(theme.items) };
+  const paddedItems = padTo30(shuffle(theme.items));
+  currentTheme = { ...theme, items: paddedItems };
   currentIndex = 0;
   score = 0;
   accuracies = [];
@@ -138,6 +152,9 @@ function showSummary() {
   $('#items-played').textContent = currentTheme.items.length;
   $('#avg-accuracy').textContent = `${Math.round(avgAcc)}%`;
   $('#summary-theme').textContent = `${currentTheme.emoji} ${currentTheme.name}`;
+  if (typeof Player !== 'undefined' && typeof window.GAME_ID !== 'undefined') {
+    Player.saveScore(window.GAME_ID, score);
+  }
   show('#summary-screen');
 }
 
