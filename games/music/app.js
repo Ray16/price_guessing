@@ -19,7 +19,31 @@ function setProgress(pct) {
   document.getElementById('clip-progress').style.width = pct + '%';
 }
 
+// ── Preview URL cache (localStorage, 30-day TTL) ──
+const CACHE_KEY = 'music_preview_cache';
+const CACHE_TTL = 30 * 24 * 60 * 60 * 1000;
+
+function getCached(name) {
+  try {
+    const cache = JSON.parse(localStorage.getItem(CACHE_KEY) || '{}');
+    const entry = cache[name];
+    if (entry && Date.now() - entry.ts < CACHE_TTL) return entry.url;
+  } catch (e) {}
+  return null;
+}
+
+function setCached(name, url) {
+  try {
+    const cache = JSON.parse(localStorage.getItem(CACHE_KEY) || '{}');
+    cache[name] = { url, ts: Date.now() };
+    localStorage.setItem(CACHE_KEY, JSON.stringify(cache));
+  } catch (e) {}
+}
+
 async function fetchPreviewUrl(name, artist) {
+  const cached = getCached(name);
+  if (cached) return cached;
+
   const query = encodeURIComponent(name + ' ' + artist);
   const res = await fetch(
     `https://itunes.apple.com/search?term=${query}&media=music&limit=10`
@@ -29,7 +53,9 @@ async function fetchPreviewUrl(name, artist) {
     r.previewUrl && !/(live|现场|remix|翻唱)/i.test(r.trackName)
   );
   const fallback = data.results.find(r => r.previewUrl);
-  return (preferred || fallback)?.previewUrl || null;
+  const url = (preferred || fallback)?.previewUrl || null;
+  if (url) setCached(name, url);
+  return url;
 }
 
 // ── Load question ──
