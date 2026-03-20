@@ -6,60 +6,86 @@ let ytPlayer = null, clipTimer = null;
 
 const CLIP_SECONDS = 12;
 
+function setOverlay(state) {
+  const anim = document.getElementById('music-anim');
+  const label = document.getElementById('music-anim-label');
+  if (state === 'loading')  { anim.textContent = '🎵'; anim.className = ''; label.textContent = '加载中…'; }
+  if (state === 'ready')    { anim.textContent = '🎵'; anim.className = ''; label.textContent = '点击播放'; }
+  if (state === 'playing')  { anim.textContent = '🎶'; anim.className = 'playing-anim'; label.textContent = '播放中…'; }
+  if (state === 'paused')   { anim.textContent = '🎵'; anim.className = ''; label.textContent = '已暂停'; }
+  if (state === 'done')     { anim.textContent = '✅'; anim.className = ''; label.textContent = '片段结束'; }
+}
+
 // ── YouTube IFrame API ──
-// Must be a global function — called by the YouTube script when ready
 window.onYouTubeIframeAPIReady = function() {
   const first = questions[0];
   ytPlayer = new YT.Player('yt-frame', {
-    width: '1',
-    height: '1',
-    videoId: first.ytId,          // init with first video so player is fully ready
+    width: '320',
+    height: '180',
+    videoId: first.ytId,
     playerVars: {
       autoplay: 0,
       controls: 0,
       disablekb: 1,
       fs: 0,
       modestbranding: 1,
-      start: first.start,
+      rel: 0,
+      iv_load_policy: 3,
     },
     events: {
       onReady() {
-        // Cue first question's video (don't autoplay)
         ytPlayer.cueVideoById({ videoId: first.ytId, startSeconds: first.start });
         document.getElementById('play-btn').disabled = false;
+        setOverlay('ready');
       },
       onStateChange(e) {
         if (e.data === YT.PlayerState.PLAYING) {
+          setOverlay('playing');
           clearTimeout(clipTimer);
-          clipTimer = setTimeout(stopClip, CLIP_SECONDS * 1000);
+          clipTimer = setTimeout(() => {
+            ytPlayer.pauseVideo();
+            document.getElementById('play-btn').textContent = '↩';
+            document.getElementById('play-hint').textContent = '片段结束，可重听';
+            setOverlay('done');
+          }, CLIP_SECONDS * 1000);
         }
+        if (e.data === YT.PlayerState.PAUSED) {
+          setOverlay('paused');
+        }
+        if (e.data === YT.PlayerState.CUED) {
+          document.getElementById('play-btn').disabled = false;
+          setOverlay('ready');
+        }
+        if (e.data === YT.PlayerState.BUFFERING) {
+          setOverlay('loading');
+        }
+      },
+      onError(e) {
+        // Video can't be embedded — show message
+        setOverlay('ready');
+        document.getElementById('music-anim-label').textContent = '⚠️ 此视频无法播放，请跳过';
+        document.getElementById('play-btn').disabled = true;
       }
     }
   });
 };
 
-// Load YouTube IFrame API script dynamically
-(function() {
+(function loadYTScript() {
   const tag = document.createElement('script');
   tag.src = 'https://www.youtube.com/iframe_api';
   document.head.appendChild(tag);
 })();
-
-function stopClip() {
-  if (ytPlayer) ytPlayer.pauseVideo();
-  document.getElementById('play-btn').textContent = '↩';
-  document.getElementById('play-hint').textContent = '再听一次';
-}
 
 // ── Game Logic ──
 function loadQuestion() {
   const q = questions[idx];
   document.getElementById('progress-text').textContent = `${idx + 1} / ${questions.length}`;
   document.getElementById('play-btn').textContent = '▶';
-  document.getElementById('play-hint').textContent = '点击播放片段';
+  document.getElementById('play-btn').disabled = true;
+  document.getElementById('play-hint').textContent = '加载中…';
   document.getElementById('result-section').classList.add('hidden');
+  setOverlay('loading');
 
-  // Pre-cue the video so play is instant
   if (ytPlayer && ytPlayer.cueVideoById) {
     ytPlayer.cueVideoById({ videoId: q.ytId, startSeconds: q.start });
   }
@@ -100,24 +126,23 @@ function pick(choice, q) {
   document.getElementById('result-card').className = `result-card ${isCorrect ? 'excellent' : 'off'}`;
   document.getElementById('btn-next').textContent = idx >= questions.length - 1 ? '查看结果' : '下一首 →';
   document.getElementById('result-section').classList.remove('hidden');
+  setOverlay('done');
 }
 
 document.getElementById('play-btn').addEventListener('click', () => {
-  if (!ytPlayer || !ytPlayer.playVideo) return;
+  if (!ytPlayer || !ytPlayer.getPlayerState) return;
   const q = questions[idx];
   const state = ytPlayer.getPlayerState();
   if (state === YT.PlayerState.PLAYING) {
-    // Pause if already playing
     ytPlayer.pauseVideo();
     document.getElementById('play-btn').textContent = '▶';
     document.getElementById('play-hint').textContent = '已暂停，点击继续';
     clearTimeout(clipTimer);
   } else {
-    // Seek to start time and play
     ytPlayer.seekTo(q.start, true);
     ytPlayer.playVideo();
-    document.getElementById('play-hint').textContent = '播放中…';
     document.getElementById('play-btn').textContent = '⏸';
+    document.getElementById('play-hint').textContent = '播放中…';
   }
 });
 
@@ -136,20 +161,16 @@ document.getElementById('btn-next').addEventListener('click', () => {
   }
 });
 
-// Start the game (questions load after YT player is ready via onReady callback)
+// Init first question UI immediately
 document.getElementById('progress-text').textContent = `1 / ${questions.length}`;
 document.getElementById('play-btn').disabled = true;
-document.getElementById('play-hint').textContent = '加载中…';
+setOverlay('loading');
 
-// Also render choices immediately so layout is ready
-(function initChoices() {
-  const q = questions[0];
-  const shuffled = GameEngine.utils.shuffle([...q.choices]);
-  document.getElementById('choices-container').innerHTML =
-    `<div class="choices">${shuffled.map(c =>
-      `<button class="choice-btn" data-choice="${c}">${c}</button>`
-    ).join('')}</div>`;
-  document.querySelectorAll('.choice-btn').forEach(btn => {
-    btn.addEventListener('click', () => pick(btn.dataset.choice, q));
-  });
-})();
+const firstShuffled = GameEngine.utils.shuffle([...questions[0].choices]);
+document.getElementById('choices-container').innerHTML =
+  `<div class="choices">${firstShuffled.map(c =>
+    `<button class="choice-btn" data-choice="${c}">${c}</button>`
+  ).join('')}</div>`;
+document.querySelectorAll('.choice-btn').forEach(btn => {
+  btn.addEventListener('click', () => pick(btn.dataset.choice, questions[0]));
+});

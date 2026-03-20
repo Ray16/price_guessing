@@ -26,8 +26,8 @@
     .play-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
     .play-hint { color: var(--text-muted); font-size: 0.9rem; }
     .clip-duration { font-size: 0.8rem; color: var(--text-muted); margin-top: 4px; }
-    /* hidden YouTube iframe */
-    #yt-frame { position: absolute; opacity: 0; pointer-events: none; width: 1px; height: 1px; }
+    @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.2)} }
+    .playing-anim { animation: pulse 0.6s ease-in-out infinite; }
     .choices { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; }
     .choice-btn {
       background: var(--surface); border: 2px solid var(--border);
@@ -51,8 +51,15 @@
         <div class="score-display">得分: <span id="score">0</span></div>
       </header>
       <main class="game-main">
-        <!-- YouTube player (must be a div; sized small but not hidden) -->
-        <div id="yt-frame" style="width:1px;height:1px;overflow:hidden;position:absolute;left:-9999px"></div>
+        <!-- YouTube player wrapper — player is visible to browser but covered visually -->
+        <div style="position:relative;width:320px;height:180px;margin:0 auto 16px;border-radius:12px;overflow:hidden;background:#000">
+          <div id="yt-frame" style="width:320px;height:180px"></div>
+          <!-- Overlay so the video (and song title) isn't visible, only audio plays -->
+          <div id="yt-overlay" style="position:absolute;inset:0;background:#1a1a2e;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;border-radius:12px;pointer-events:none">
+            <div id="music-anim" style="font-size:2.5rem">🎵</div>
+            <div id="music-anim-label" style="color:#8888a0;font-size:0.85rem">等待播放…</div>
+          </div>
+        </div>
 
         <div class="music-player">
           <button class="play-btn" id="play-btn">▶</button>
