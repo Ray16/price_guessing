@@ -48,8 +48,17 @@
       </div>
     </div>
   </div>
+  <!-- Daily loading overlay -->
+  <div id="daily-loading" style="display:none;position:fixed;inset:0;background:var(--bg,#0a0a12);z-index:999;flex-direction:column;align-items:center;justify-content:center;gap:16px">
+    <div style="font-size:2.5rem">💬</div>
+    <div style="font-size:1.1rem;font-weight:600">正在生成今日题目…</div>
+    <div style="color:#888;font-size:0.9rem">每天都有新问题</div>
+  </div>
+
+  <script src="../../shared/firebase-config.js"></script>
   <script src="../../shared/player.js"></script>
   <script src="../../shared/engine.js"></script>
+  <script src="../../shared/daily-loader.js"></script>
   <script src="data.js"></script>
   <script src="app.js"></script>
 </body>

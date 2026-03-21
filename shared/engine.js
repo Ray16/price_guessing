@@ -10,6 +10,27 @@ const GameEngine = (() => {
       }
       return a;
     },
+    // Deterministic shuffle using Mulberry32 PRNG — same seed = same order
+    seededShuffle(arr, seed) {
+      let s = seed >>> 0;
+      function rand() {
+        s = (s + 0x6D2B79F5) >>> 0;
+        let t = Math.imul(s ^ (s >>> 15), 1 | s);
+        t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+      }
+      const a = [...arr];
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(rand() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    },
+    // Returns today's date as YYYYMMDD integer — changes every day at midnight
+    getDaySeed() {
+      const d = new Date();
+      return d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate();
+    },
     formatNum(val, decimals = 0) {
       return val.toLocaleString('zh-CN', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
     },
@@ -163,24 +184,29 @@ const GameEngine = (() => {
     },
     _load() {
       const q = this._q[this._idx];
+      // Shuffle choices so correct answer isn't always in the same position
+      const correctChoice = q.choices[q.correctIdx];
+      const shuffledChoices = utils.shuffle([...q.choices]);
+      const displayQ = { ...q, choices: shuffledChoices, correctIdx: shuffledChoices.indexOf(correctChoice) };
+
       document.querySelector('#progress-text').textContent = `${this._idx + 1} / ${this._q.length}`;
       // Render prompt
       const promptArea = document.querySelector('#prompt-area');
       if (this._cfg.renderPrompt) {
-        promptArea.innerHTML = this._cfg.renderPrompt(q);
+        promptArea.innerHTML = this._cfg.renderPrompt(displayQ);
       } else {
-        promptArea.innerHTML = `<div class="prompt-box"><div class="prompt-text">${q.prompt}</div></div>`;
+        promptArea.innerHTML = `<div class="prompt-box"><div class="prompt-text">${displayQ.prompt}</div></div>`;
       }
       // Render choices
       const container = document.querySelector('#choices-container');
-      const numCols = q.choices.length === 2 ? 'choices-2' : 'choices-4';
+      const numCols = displayQ.choices.length === 2 ? 'choices-2' : 'choices-4';
       container.innerHTML = `<div class="choices ${numCols}">${
-        q.choices.map((c, i) => `<button class="choice-btn${this._cfg.swatchBtn ? ' swatch-btn' : ''}" data-idx="${i}">${
+        displayQ.choices.map((c, i) => `<button class="choice-btn${this._cfg.swatchBtn ? ' swatch-btn' : ''}" data-idx="${i}">${
           this._cfg.renderChoice ? this._cfg.renderChoice(c) : c.label
         }</button>`).join('')
       }</div>`;
       container.querySelectorAll('.choice-btn').forEach(btn => {
-        btn.onclick = () => this._pick(parseInt(btn.dataset.idx), q);
+        btn.onclick = () => this._pick(parseInt(btn.dataset.idx), displayQ);
       });
       document.querySelector('#result-section').classList.add('hidden');
     },

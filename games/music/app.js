@@ -1,6 +1,11 @@
 window.GAME_ID = 'music';
 
-const questions = GameEngine.utils.shuffle([...DATA]).slice(0, 10);
+// Questions loaded asynchronously — DailyLoader fetches fresh AI questions or falls back to static data
+let questions = [];
+const _questionsReady = DailyLoader.load('music', DATA, { timeoutMs: 5000 }).then(qs => {
+  questions = qs;
+  loadQuestion(); // Start first question once data is ready
+});
 let idx = 0, score = 0, correct = 0, streak = 0;
 let audio = null, progressTimer = null;
 let currentPreviewUrl = null; // fetched async; Audio created only on user tap
@@ -202,5 +207,4 @@ document.getElementById('btn-next').addEventListener('click', () => {
   }
 });
 
-// ── Init ──
-loadQuestion();
+// ── Init ── (called by DailyLoader once questions are ready)
