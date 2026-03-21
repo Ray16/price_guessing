@@ -15,7 +15,14 @@
       "Read(//Users/rayzhu/Documents/fun_with_hebe/**)",
       "Bash(done)",
       "Bash(for f:*)",
-      "WebSearch"
+      "WebSearch",
+      "Bash(wc -l /Users/rayzhu/Documents/fun_with_hebe/games/*/data.js)",
+      "Bash(grep -n \"const DATA\" /Users/rayzhu/Documents/fun_with_hebe/games/*/data.js)",
+      "Bash(git push:*)",
+      "WebFetch(domain:api.deezer.com)",
+      "WebFetch(domain:cdnt-preview.dzcdn.net)",
+      "WebFetch(domain:itunes.apple.com)",
+      "WebFetch(domain:audio-ssl.itunes.apple.com)"
     ]
   }
 }
